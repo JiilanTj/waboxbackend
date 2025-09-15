@@ -8,6 +8,7 @@ import { PrismaClient } from './generated/prisma';
 import { setupMiddlewares, notFoundHandler, errorHandler } from './utils/middleware';
 import { setupRoutes } from './routes';
 import { setupSocketHandlers } from './utils/socketHandler';
+import { setupSwagger } from './utils/swagger';
 
 // Load environment variables
 dotenv.config();
@@ -28,6 +29,9 @@ const PORT = process.env.PORT || 5000;
 
 // Setup middlewares
 setupMiddlewares(app);
+
+// Setup Swagger documentation
+setupSwagger(app);
 
 // Setup routes
 setupRoutes(app);
