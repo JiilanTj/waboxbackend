@@ -10,7 +10,11 @@
     "build:watch": "tsc --watch",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:seed": "ts-node prisma/seed.ts",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate",
+    "db:reset": "npx prisma migrate reset --force && npm run db:seed"
   },
   "author": "Palvia",
   "license": "ISC",

@@ -3,6 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
+// Re-export auth utilities for convenience
+export { authenticateToken, requireAdmin, optionalAuth } from './auth';
+
 export const setupMiddlewares = (app: Application) => {
   // Security headers
   app.use(helmet());
