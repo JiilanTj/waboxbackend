@@ -139,9 +139,28 @@ exports.Prisma.WhatsAppNumberScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.WhatsAppSessionScalarFieldEnum = {
+  id: 'id',
+  whatsappNumberId: 'whatsappNumberId',
+  sessionData: 'sessionData',
+  qrCode: 'qrCode',
+  status: 'status',
+  lastConnected: 'lastConnected',
+  isActive: 'isActive',
+  connectionInfo: 'connectionInfo',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
@@ -155,14 +174,45 @@ exports.Prisma.WhatsAppNumberOrderByRelevanceFieldEnum = {
   name: 'name',
   phoneNumber: 'phoneNumber'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.WhatsAppSessionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  qrCode: 'qrCode',
+  errorMessage: 'errorMessage'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
 };
 
+exports.SessionStatus = exports.$Enums.SessionStatus = {
+  PENDING: 'PENDING',
+  CONNECTED: 'CONNECTED',
+  DISCONNECTED: 'DISCONNECTED',
+  PAIRING: 'PAIRING',
+  ERROR: 'ERROR'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
-  WhatsAppNumber: 'WhatsAppNumber'
+  WhatsAppNumber: 'WhatsAppNumber',
+  WhatsAppSession: 'WhatsAppSession'
 };
 
 /**

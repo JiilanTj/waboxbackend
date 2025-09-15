@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '../generated/prisma';
+import { normalizePhoneNumber, formatPhoneForDisplay, isValidIndonesianMobile } from '../utils/phoneUtils';
 
 const prisma = new PrismaClient();
 
@@ -49,7 +50,10 @@ export const getWhatsAppNumbers = async (req: Request, res: Response): Promise<v
     const totalPages = Math.ceil(total / limitNum);
 
     res.json({
-      whatsappNumbers,
+      whatsappNumbers: whatsappNumbers.map(number => ({
+        ...number,
+        phoneNumberFormatted: formatPhoneForDisplay(number.phoneNumber)
+      })),
       pagination: {
         currentPage: pageNum,
         totalPages,
@@ -83,41 +87,48 @@ export const createWhatsAppNumber = async (req: Request, res: Response): Promise
       return;
     }
 
-    // Validate phone number format (basic validation)
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phoneRegex.test(phoneNumber)) {
+    // Normalize and validate phone number
+    const normalizedPhone = normalizePhoneNumber(phoneNumber);
+    if (!normalizedPhone) {
       res.status(400).json({
         error: 'Bad Request',
-        message: 'Invalid phone number format'
+        message: 'Invalid Indonesian mobile phone number format. Please use format like: 08123456789, +628123456789, or 628123456789'
       });
       return;
     }
 
-    // Check if phone number already exists
+    // Check if normalized phone number already exists
     const existingNumber = await prisma.whatsAppNumber.findUnique({
-      where: { phoneNumber }
+      where: { phoneNumber: normalizedPhone }
     });
 
     if (existingNumber) {
       res.status(409).json({
         error: 'Conflict',
-        message: 'Phone number already exists'
+        message: 'Phone number already exists',
+        details: {
+          existingNumber: formatPhoneForDisplay(existingNumber.phoneNumber),
+          normalizedInput: formatPhoneForDisplay(normalizedPhone)
+        }
       });
       return;
     }
 
-    // Create WhatsApp number
+    // Create WhatsApp number with normalized phone
     const newWhatsAppNumber = await prisma.whatsAppNumber.create({
       data: {
         name,
-        phoneNumber,
+        phoneNumber: normalizedPhone,
         isActive: Boolean(isActive)
       }
     });
 
     res.status(201).json({
       message: 'WhatsApp number created successfully',
-      whatsappNumber: newWhatsAppNumber
+      whatsappNumber: {
+        ...newWhatsAppNumber,
+        phoneNumberFormatted: formatPhoneForDisplay(newWhatsAppNumber.phoneNumber)
+      }
     });
 
   } catch (error) {
@@ -156,7 +167,10 @@ export const getWhatsAppNumberById = async (req: Request, res: Response): Promis
     }
 
     res.json({
-      whatsappNumber
+      whatsappNumber: {
+        ...whatsappNumber,
+        phoneNumberFormatted: formatPhoneForDisplay(whatsappNumber.phoneNumber)
+      }
     });
 
   } catch (error) {
@@ -203,12 +217,12 @@ export const updateWhatsAppNumber = async (req: Request, res: Response): Promise
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
     
     if (phoneNumber) {
-      // Validate phone number format
-      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-      if (!phoneRegex.test(phoneNumber)) {
+      // Normalize and validate phone number
+      const normalizedPhone = normalizePhoneNumber(phoneNumber);
+      if (!normalizedPhone) {
         res.status(400).json({
           error: 'Bad Request',
-          message: 'Invalid phone number format'
+          message: 'Invalid Indonesian mobile phone number format. Please use format like: 08123456789, +628123456789, or 628123456789'
         });
         return;
       }
@@ -218,7 +232,7 @@ export const updateWhatsAppNumber = async (req: Request, res: Response): Promise
         where: {
           AND: [
             { id: { not: numberId } },
-            { phoneNumber }
+            { phoneNumber: normalizedPhone }
           ]
         }
       });
@@ -226,12 +240,16 @@ export const updateWhatsAppNumber = async (req: Request, res: Response): Promise
       if (duplicateNumber) {
         res.status(409).json({
           error: 'Conflict',
-          message: 'Phone number already exists'
+          message: 'Phone number already exists',
+          details: {
+            existingNumber: formatPhoneForDisplay(duplicateNumber.phoneNumber),
+            normalizedInput: formatPhoneForDisplay(normalizedPhone)
+          }
         });
         return;
       }
 
-      updateData.phoneNumber = phoneNumber;
+      updateData.phoneNumber = normalizedPhone;
     }
 
     // Update WhatsApp number
@@ -242,7 +260,10 @@ export const updateWhatsAppNumber = async (req: Request, res: Response): Promise
 
     res.json({
       message: 'WhatsApp number updated successfully',
-      whatsappNumber: updatedNumber
+      whatsappNumber: {
+        ...updatedNumber,
+        phoneNumberFormatted: formatPhoneForDisplay(updatedNumber.phoneNumber)
+      }
     });
 
   } catch (error) {

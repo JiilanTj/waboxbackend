@@ -32,6 +32,14 @@ model User {
   @@map("users")
 }
 
+enum SessionStatus {
+  PENDING
+  CONNECTED
+  DISCONNECTED
+  PAIRING
+  ERROR
+}
+
 model WhatsAppNumber {
   id          Int      @id @default(autoincrement())
   name        String
@@ -39,5 +47,29 @@ model WhatsAppNumber {
   isActive    Boolean  @default(false)
   createdAt   DateTime @default(now())
 
+  // Relation to sessions
+  sessions    WhatsAppSession[]
+
   @@map("whatsapp_numbers")
+}
+
+model WhatsAppSession {
+  id                String        @id @default(uuid())
+  whatsappNumberId  Int
+  sessionData       Json?         // Baileys session data (encrypted)
+  qrCode            String?       @db.Text // QR Code base64 string
+  status            SessionStatus @default(PENDING)
+  lastConnected     DateTime?
+  isActive          Boolean       @default(false)
+  connectionInfo    Json?         // Additional connection metadata
+  errorMessage      String?       @db.Text
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Relations
+  whatsappNumber    WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)
+
+  @@map("whatsapp_sessions")
+  @@index([whatsappNumberId])
+  @@index([status])
 }

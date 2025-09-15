@@ -111,9 +111,28 @@ exports.Prisma.WhatsAppNumberScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.WhatsAppSessionScalarFieldEnum = {
+  id: 'id',
+  whatsappNumberId: 'whatsappNumberId',
+  sessionData: 'sessionData',
+  qrCode: 'qrCode',
+  status: 'status',
+  lastConnected: 'lastConnected',
+  isActive: 'isActive',
+  connectionInfo: 'connectionInfo',
+  errorMessage: 'errorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
@@ -127,14 +146,45 @@ exports.Prisma.WhatsAppNumberOrderByRelevanceFieldEnum = {
   name: 'name',
   phoneNumber: 'phoneNumber'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.WhatsAppSessionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  qrCode: 'qrCode',
+  errorMessage: 'errorMessage'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
 };
 
+exports.SessionStatus = exports.$Enums.SessionStatus = {
+  PENDING: 'PENDING',
+  CONNECTED: 'CONNECTED',
+  DISCONNECTED: 'DISCONNECTED',
+  PAIRING: 'PAIRING',
+  ERROR: 'ERROR'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
-  WhatsAppNumber: 'WhatsAppNumber'
+  WhatsAppNumber: 'WhatsAppNumber',
+  WhatsAppSession: 'WhatsAppSession'
 };
 /**
  * Create the Client
@@ -183,13 +233,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum UserRole {\n  USER\n  ADMIN\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String\n  username  String   @unique\n  email     String   @unique\n  role      UserRole @default(USER)\n  password  String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nmodel WhatsAppNumber {\n  id          Int      @id @default(autoincrement())\n  name        String\n  phoneNumber String   @unique\n  isActive    Boolean  @default(false)\n  createdAt   DateTime @default(now())\n\n  @@map(\"whatsapp_numbers\")\n}\n",
-  "inlineSchemaHash": "e867b16850e136883c9f182e72bf7a1667c1a71eb4a7a3bdb20804e8e6473c01",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum UserRole {\n  USER\n  ADMIN\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String\n  username  String   @unique\n  email     String   @unique\n  role      UserRole @default(USER)\n  password  String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nenum SessionStatus {\n  PENDING\n  CONNECTED\n  DISCONNECTED\n  PAIRING\n  ERROR\n}\n\nmodel WhatsAppNumber {\n  id          Int      @id @default(autoincrement())\n  name        String\n  phoneNumber String   @unique\n  isActive    Boolean  @default(false)\n  createdAt   DateTime @default(now())\n\n  // Relation to sessions\n  sessions WhatsAppSession[]\n\n  @@map(\"whatsapp_numbers\")\n}\n\nmodel WhatsAppSession {\n  id               String        @id @default(uuid())\n  whatsappNumberId Int\n  sessionData      Json? // Baileys session data (encrypted)\n  qrCode           String?       @db.Text // QR Code base64 string\n  status           SessionStatus @default(PENDING)\n  lastConnected    DateTime?\n  isActive         Boolean       @default(false)\n  connectionInfo   Json? // Additional connection metadata\n  errorMessage     String?       @db.Text\n  createdAt        DateTime      @default(now())\n  updatedAt        DateTime      @updatedAt\n\n  // Relations\n  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)\n\n  @@index([whatsappNumberId])\n  @@index([status])\n  @@map(\"whatsapp_sessions\")\n}\n",
+  "inlineSchemaHash": "ba79a029ee16233461eb5ecb40cf547850e5445af1be95e8255c2a6cb12da33c",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"WhatsAppNumber\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"whatsapp_numbers\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"WhatsAppNumber\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"WhatsAppSession\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"}],\"dbName\":\"whatsapp_numbers\"},\"WhatsAppSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatsappNumberId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sessionData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"qrCode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SessionStatus\"},{\"name\":\"lastConnected\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"connectionInfo\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"errorMessage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"whatsappNumber\",\"kind\":\"object\",\"type\":\"WhatsAppNumber\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"}],\"dbName\":\"whatsapp_sessions\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
