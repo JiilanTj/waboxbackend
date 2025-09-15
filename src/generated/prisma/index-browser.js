@@ -131,6 +131,14 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.WhatsAppNumberScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  phoneNumber: 'phoneNumber',
+  isActive: 'isActive',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -142,13 +150,19 @@ exports.Prisma.UserOrderByRelevanceFieldEnum = {
   email: 'email',
   password: 'password'
 };
+
+exports.Prisma.WhatsAppNumberOrderByRelevanceFieldEnum = {
+  name: 'name',
+  phoneNumber: 'phoneNumber'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
 };
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  WhatsAppNumber: 'WhatsAppNumber'
 };
 
 /**

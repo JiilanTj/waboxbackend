@@ -68,6 +68,92 @@ const swaggerDefinition = {
           }
         }
       },
+      // WhatsApp Number schemas
+      WhatsAppNumber: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'integer',
+            description: 'WhatsApp number ID'
+          },
+          name: {
+            type: 'string',
+            description: 'Display name for the WhatsApp number'
+          },
+          phoneNumber: {
+            type: 'string',
+            description: 'WhatsApp phone number'
+          },
+          isActive: {
+            type: 'boolean',
+            description: 'Whether the number is active'
+          },
+          createdAt: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Creation date'
+          }
+        }
+      },
+      CreateWhatsAppNumberRequest: {
+        type: 'object',
+        required: ['name', 'phoneNumber'],
+        properties: {
+          name: {
+            type: 'string',
+            description: 'Display name for the WhatsApp number'
+          },
+          phoneNumber: {
+            type: 'string',
+            description: 'WhatsApp phone number (must be unique)'
+          },
+          isActive: {
+            type: 'boolean',
+            default: false,
+            description: 'Whether the number is active'
+          }
+        }
+      },
+      WhatsAppNumbersResponse: {
+        type: 'object',
+        properties: {
+          whatsappNumbers: {
+            type: 'array',
+            items: {
+              $ref: '#/components/schemas/WhatsAppNumber'
+            }
+          },
+          pagination: {
+            type: 'object',
+            properties: {
+              currentPage: {
+                type: 'integer',
+                description: 'Current page number'
+              },
+              totalPages: {
+                type: 'integer',
+                description: 'Total number of pages'
+              },
+              totalNumbers: {
+                type: 'integer',
+                description: 'Total number of WhatsApp numbers'
+              },
+              limit: {
+                type: 'integer',
+                description: 'Items per page'
+              },
+              hasNextPage: {
+                type: 'boolean',
+                description: 'Has next page'
+              },
+              hasPrevPage: {
+                type: 'boolean',
+                description: 'Has previous page'
+              }
+            }
+          }
+        }
+      },
       // Login schemas
       LoginRequest: {
         type: 'object',

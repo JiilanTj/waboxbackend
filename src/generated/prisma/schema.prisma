@@ -31,3 +31,13 @@ model User {
 
   @@map("users")
 }
+
+model WhatsAppNumber {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phoneNumber String   @unique
+  isActive    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("whatsapp_numbers")
+}

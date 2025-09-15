@@ -38,6 +38,33 @@ async function main() {
     }
   });
 
+  // Create sample WhatsApp numbers
+  const whatsappNumbers = [
+    {
+      name: 'Customer Service 1',
+      phoneNumber: '+6281234567890',
+      isActive: true
+    },
+    {
+      name: 'Customer Service 2', 
+      phoneNumber: '+6281234567891',
+      isActive: false
+    },
+    {
+      name: 'Sales Team',
+      phoneNumber: '+6281234567892',
+      isActive: true
+    }
+  ];
+
+  for (const waNumber of whatsappNumbers) {
+    await prisma.whatsAppNumber.upsert({
+      where: { phoneNumber: waNumber.phoneNumber },
+      update: {},
+      create: waNumber
+    });
+  }
+
   console.log('✅ Database seeded successfully!');
   console.log('👤 Admin User:', {
     id: adminUser.id,
@@ -52,7 +79,8 @@ async function main() {
     role: sampleUser.role
   });
   
-  console.log('\n🔑 Login Credentials:');
+  console.log('\n� Sample WhatsApp Numbers created');
+  console.log('\n�🔑 Login Credentials:');
   console.log('Admin: admin / admin123');
   console.log('User: user1 / user123');
 }

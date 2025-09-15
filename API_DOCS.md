@@ -35,6 +35,14 @@ Authorization: Bearer <your-jwt-token>
 - `PUT /api/v1/users/:id` - Update user
 - `DELETE /api/v1/users/:id` - Delete user
 
+### **📱 WhatsApp Management** (Authenticated)
+- `GET /api/v1/whatsapp` - Get all WhatsApp numbers with pagination
+- `POST /api/v1/whatsapp` - Create new WhatsApp number (Admin only)
+- `GET /api/v1/whatsapp/:id` - Get WhatsApp number by ID
+- `PUT /api/v1/whatsapp/:id` - Update WhatsApp number (Admin only)
+- `DELETE /api/v1/whatsapp/:id` - Delete WhatsApp number (Admin only)
+- `PATCH /api/v1/whatsapp/:id/toggle-status` - Toggle active/inactive status (Admin only)
+
 ### **🛠️ System**
 - `GET /health` - Health check
 - `GET /api` - API information
@@ -72,10 +80,18 @@ curl -X GET http://localhost:5000/api/v1/me \
   -H "Authorization: Bearer <your-token>"
 ```
 
-### **3. Get Users (Admin):**
+### **4. Get WhatsApp Numbers:**
 ```bash
-curl -X GET "http://localhost:5000/api/v1/users?page=1&limit=10" \
-  -H "Authorization: Bearer <admin-token>"
+curl -X GET "http://localhost:5000/api/v1/whatsapp?page=1&limit=10" \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### **5. Create WhatsApp Number (Admin):**
+```bash
+curl -X POST http://localhost:5000/api/v1/whatsapp \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <admin-token>" \
+  -d '{"name": "Customer Service 3", "phoneNumber": "+6281234567893", "isActive": true}'
 ```
 
 ## 📝 **Query Parameters**
@@ -88,11 +104,19 @@ curl -X GET "http://localhost:5000/api/v1/users?page=1&limit=10" \
 - `sortBy` - Sort field (default: createdAt)
 - `sortOrder` - Sort order (asc|desc, default: desc)
 
+### **WhatsApp Numbers Pagination:**
+- `page` - Page number (default: 1) 
+- `limit` - Items per page (default: 10)
+- `search` - Search term for name/phone number
+- `isActive` - Filter by active status (true|false)
+- `sortBy` - Sort field (default: createdAt)
+- `sortOrder` - Sort order (asc|desc, default: desc)
+
 ## 🔒 **Role-based Access**
 
 - **Public:** `/health`, `/api`, `/api/v1/login`
-- **Authenticated:** `/api/v1/me`, `/api/v1/logout`
-- **Admin Only:** All `/api/v1/users/*` endpoints
+- **Authenticated:** `/api/v1/me`, `/api/v1/logout`, `/api/v1/whatsapp` (GET)
+- **Admin Only:** All `/api/v1/users/*` endpoints, `/api/v1/whatsapp` (POST/PUT/DELETE/PATCH)
 
 ## 📋 **Status Codes**
 
