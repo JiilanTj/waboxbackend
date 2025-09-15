@@ -96,4 +96,7 @@ coverage/
 # Temporary folders
 tmp/
 temp/
-/src/generated/prisma
+
+# Uploads and sessions
+uploads/
+sessions/
