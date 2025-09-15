@@ -94,7 +94,7 @@ const router = Router();
 
 /**
  * @swagger
- * /api/sessions/{whatsappNumberId}:
+ * /api/v1/sessions/{whatsappNumberId}:
  *   post:
  *     summary: Create or update WhatsApp session
  *     description: Create a new session or update existing active session for a WhatsApp number (Admin only)
@@ -174,12 +174,12 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/:whatsappNumberId', authenticateToken, requireAdmin, createOrUpdateSession);
-router.get('/:whatsappNumberId', authenticateToken, getSessionByWhatsappNumber);
+router.post('/api/v1/sessions/:whatsappNumberId', authenticateToken, requireAdmin, createOrUpdateSession);
+router.get('/api/v1/sessions/:whatsappNumberId', authenticateToken, getSessionByWhatsappNumber);
 
 /**
  * @swagger
- * /api/sessions:
+ * /api/v1/sessions:
  *   get:
  *     summary: Get all sessions with pagination
  *     description: Retrieve all WhatsApp sessions with filtering and pagination (Admin only)
@@ -243,11 +243,11 @@ router.get('/:whatsappNumberId', authenticateToken, getSessionByWhatsappNumber);
  *       500:
  *         description: Internal server error
  */
-router.get('/', authenticateToken, requireAdmin, getAllSessions);
+router.get('/api/v1/sessions', authenticateToken, requireAdmin, getAllSessions);
 
 /**
  * @swagger
- * /api/sessions/{sessionId}/status:
+ * /api/v1/sessions/{sessionId}/status:
  *   patch:
  *     summary: Update session status
  *     description: Update the status of a WhatsApp session (Admin only)
@@ -292,11 +292,11 @@ router.get('/', authenticateToken, requireAdmin, getAllSessions);
  *       500:
  *         description: Internal server error
  */
-router.patch('/:sessionId/status', authenticateToken, requireAdmin, updateSessionStatus);
+router.patch('/api/v1/sessions/:sessionId/status', authenticateToken, requireAdmin, updateSessionStatus);
 
 /**
  * @swagger
- * /api/sessions/{sessionId}/qr:
+ * /api/v1/sessions/{sessionId}/qr:
  *   get:
  *     summary: Get QR code for session
  *     description: Retrieve the QR code for a WhatsApp session
@@ -340,11 +340,11 @@ router.patch('/:sessionId/status', authenticateToken, requireAdmin, updateSessio
  *       500:
  *         description: Internal server error
  */
-router.get('/:sessionId/qr', authenticateToken, getSessionQR);
+router.get('/api/v1/sessions/:sessionId/qr', authenticateToken, getSessionQR);
 
 /**
  * @swagger
- * /api/sessions/{sessionId}:
+ * /api/v1/sessions/{sessionId}:
  *   delete:
  *     summary: Deactivate session
  *     description: Deactivate (soft delete) a WhatsApp session (Admin only)
@@ -379,11 +379,11 @@ router.get('/:sessionId/qr', authenticateToken, getSessionQR);
  *       500:
  *         description: Internal server error
  */
-router.delete('/:sessionId', authenticateToken, requireAdmin, deactivateSession);
+router.delete('/api/v1/sessions/:sessionId', authenticateToken, requireAdmin, deactivateSession);
 
 /**
  * @swagger
- * /api/sessions/{sessionId}/permanent:
+ * /api/v1/sessions/{sessionId}/permanent:
  *   delete:
  *     summary: Permanently delete session
  *     description: Permanently delete a WhatsApp session from database (Admin only)
@@ -418,6 +418,6 @@ router.delete('/:sessionId', authenticateToken, requireAdmin, deactivateSession)
  *       500:
  *         description: Internal server error
  */
-router.delete('/:sessionId/permanent', authenticateToken, requireAdmin, deleteSession);
+router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, requireAdmin, deleteSession);
 
 export default router;

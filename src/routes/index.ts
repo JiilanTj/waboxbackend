@@ -11,7 +11,7 @@ export const setupRoutes = (app: Application) => {
   app.use(authRoutes);
   app.use(userRoutes);
   app.use(whatsappRoutes);
-  app.use('/api/sessions', sessionRoutes);
+  app.use(sessionRoutes); // No prefix needed, routes already include full path
   
   // Add other routes here when needed
   // app.use('/api/messages', messageRoutes);
