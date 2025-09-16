@@ -9,6 +9,7 @@ import { setupMiddlewares, notFoundHandler, errorHandler } from './utils/middlew
 import { setupRoutes } from './routes';
 import { setupSocketHandlers } from './utils/socketHandler';
 import { setupSwagger } from './utils/swagger';
+import { whatsappSessionManager } from './services/whatsapp/SessionManager';
 
 // Load environment variables
 dotenv.config();
@@ -52,19 +53,57 @@ server.listen(PORT, async () => {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
     
+    // Initialize WhatsApp Session Manager
+    console.log('🔄 Initializing WhatsApp Session Manager...');
+    await whatsappSessionManager.initializeExistingSessions();
+    console.log('✅ WhatsApp Session Manager initialized');
+    
     console.log(`🚀 WaBox Backend server is running on port ${PORT}`);
     console.log(`📱 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`🌐 Socket.io server is ready for connections`);
+    console.log(`📊 API Documentation: http://localhost:${PORT}/api/docs`);
   } catch (error) {
-    console.error('❌ Failed to connect to database:', error);
+    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 });
 
 // Graceful shutdown
 process.on('beforeExit', async () => {
+  console.log('🔄 Shutting down gracefully...');
+  
+  // Cleanup WhatsApp sessions
+  await whatsappSessionManager.cleanup();
+  
+  // Disconnect database
   await prisma.$disconnect();
   console.log('🔌 Database disconnected');
+  console.log('✅ Server shut down complete');
+});
+
+// Handle process termination
+process.on('SIGTERM', async () => {
+  console.log('🔄 SIGTERM received, shutting down gracefully...');
+  
+  // Cleanup WhatsApp sessions
+  await whatsappSessionManager.cleanup();
+  
+  // Disconnect database
+  await prisma.$disconnect();
+  
+  process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+  console.log('🔄 SIGINT received, shutting down gracefully...');
+  
+  // Cleanup WhatsApp sessions
+  await whatsappSessionManager.cleanup();
+  
+  // Disconnect database
+  await prisma.$disconnect();
+  
+  process.exit(0);
 });
 
 export default app;

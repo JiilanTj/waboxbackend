@@ -6,7 +6,8 @@ import {
   updateSessionStatus, 
   getSessionQR, 
   deactivateSession, 
-  deleteSession 
+  deleteSession,
+  sendMessage
 } from '../controllers/sessionController';
 import { authenticateToken, requireAdmin } from '../utils/middleware';
 
@@ -419,5 +420,87 @@ router.delete('/api/v1/sessions/:sessionId', authenticateToken, requireAdmin, de
  *         description: Internal server error
  */
 router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, requireAdmin, deleteSession);
+
+/**
+ * @swagger
+ * /api/v1/sessions/{sessionId}/send:
+ *   post:
+ *     summary: Send WhatsApp message
+ *     description: Send a message through an active WhatsApp session (Admin only)
+ *     tags: [Sessions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: sessionId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Session ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - to
+ *               - message
+ *             properties:
+ *               to:
+ *                 type: string
+ *                 description: Recipient phone number (any format)
+ *                 example: "08123456789"
+ *               message:
+ *                 type: string
+ *                 description: Message text to send
+ *                 example: "Hello from WaBox!"
+ *     responses:
+ *       200:
+ *         description: Message sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     sessionId:
+ *                       type: string
+ *                     from:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         name:
+ *                           type: string
+ *                         phoneNumber:
+ *                           type: string
+ *                     to:
+ *                       type: string
+ *                     message:
+ *                       type: string
+ *                     messageId:
+ *                       type: string
+ *                     timestamp:
+ *                       type: string
+ *                       format: date-time
+ *       400:
+ *         description: Bad request - Missing required fields or session not active
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *       403:
+ *         description: Forbidden - Admin role required
+ *       404:
+ *         description: Session not found
+ *       500:
+ *         description: Internal server error or failed to send message
+ */
+router.post('/api/v1/sessions/:sessionId/send', authenticateToken, requireAdmin, sendMessage);
 
 export default router;

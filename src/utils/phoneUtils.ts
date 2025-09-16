@@ -38,14 +38,15 @@ export const normalizePhoneNumber = (phoneNumber: string): string | null => {
     return null;
   }
   
-  // Validate length (Indonesian mobile numbers should be 11-13 digits including country code)
-  if (normalized.length < 11 || normalized.length > 13) {
+  // Validate length (Indonesian mobile numbers should be flexible)
+  // Minimum 10 digits (62 + 8 digits), maximum 15 digits total
+  if (normalized.length < 10 || normalized.length > 15) {
     return null;
   }
   
   // Additional validation for Indonesian mobile numbers
-  // Valid prefixes after 62: 8 (from 08xx)
-  if (!normalized.match(/^628[0-9]{8,10}$/)) {
+  // Valid prefixes after 62: 8 (from 08xx) - more flexible pattern
+  if (!normalized.match(/^628[0-9]{7,12}$/)) {
     return null;
   }
   

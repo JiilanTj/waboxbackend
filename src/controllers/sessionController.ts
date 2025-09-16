@@ -1,18 +1,17 @@
 import { Request, Response } from 'express';
 import { PrismaClient, SessionStatus } from '../generated/prisma';
-import { phoneToWhatsAppJID } from '../utils/phoneUtils';
+import { phoneToWhatsAppJID, formatPhoneForDisplay } from '../utils/phoneUtils';
+import { whatsappSessionManager } from '../services/whatsapp/SessionManager';
 
 const prisma = new PrismaClient();
 
 /**
  * Create or update a WhatsApp session
- * @route POST /api/sessions/:whatsappNumberId
+ * @route POST /api/v1/sessions/:whatsappNumberId
  */
 export const createOrUpdateSession = async (req: Request, res: Response): Promise<void> => {
   try {
     const { whatsappNumberId } = req.params;
-    const { sessionData, qrCode, status, connectionInfo } = req.body;
-
     const whatsappNumberIdInt = parseInt(whatsappNumberId);
     
     if (isNaN(whatsappNumberIdInt)) {
@@ -36,71 +35,52 @@ export const createOrUpdateSession = async (req: Request, res: Response): Promis
       return;
     }
 
-    // Find existing session or create new one
-    let session = await prisma.whatsAppSession.findFirst({
-      where: { 
-        whatsappNumberId: whatsappNumberIdInt,
-        isActive: true 
-      },
-      include: {
-        whatsappNumber: true
+    try {
+      // Create session using SessionManager
+      const sessionId = await whatsappSessionManager.createSession(
+        whatsappNumberIdInt, 
+        whatsappNumber.phoneNumber
+      );
+
+      // Get updated session from database
+      const session = await prisma.whatsAppSession.findUnique({
+        where: { id: sessionId },
+        include: { whatsappNumber: true }
+      });
+
+      if (!session) {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to create session'
+        });
+        return;
       }
-    });
 
-    let isNewSession = false;
-
-    if (session) {
-      // Update existing session
-      session = await prisma.whatsAppSession.update({
-        where: { id: session.id },
+      res.status(200).json({
+        success: true,
+        message: 'Session created successfully',
         data: {
-          sessionData: sessionData || session.sessionData,
-          qrCode: qrCode || session.qrCode,
-          status: status || session.status,
-          connectionInfo: connectionInfo || session.connectionInfo,
-          lastConnected: status === SessionStatus.CONNECTED ? new Date() : session.lastConnected,
-          errorMessage: status === SessionStatus.ERROR ? req.body.errorMessage : null,
-          updatedAt: new Date()
-        },
-        include: {
-          whatsappNumber: true
+          id: session.id,
+          whatsappNumberId: session.whatsappNumberId,
+          whatsappNumber: {
+            ...session.whatsappNumber,
+            phoneNumberFormatted: formatPhoneForDisplay(session.whatsappNumber.phoneNumber)
+          },
+          status: session.status,
+          qrCode: session.qrCode,
+          lastConnected: session.lastConnected,
+          isActive: session.isActive,
+          createdAt: session.createdAt,
+          updatedAt: session.updatedAt
         }
       });
-    } else {
-      // Create new session
-      session = await prisma.whatsAppSession.create({
-        data: {
-          whatsappNumberId: whatsappNumberIdInt,
-          sessionData,
-          qrCode,
-          status: status || SessionStatus.PENDING,
-          connectionInfo,
-          isActive: true,
-          lastConnected: status === SessionStatus.CONNECTED ? new Date() : null,
-          errorMessage: status === SessionStatus.ERROR ? req.body.errorMessage : null
-        },
-        include: {
-          whatsappNumber: true
-        }
+    } catch (error) {
+      console.error('SessionManager error:', error);
+      res.status(500).json({
+        success: false,
+        message: `Failed to create session: ${error}`
       });
-      isNewSession = true;
     }
-
-    res.status(200).json({
-      success: true,
-      message: isNewSession ? 'Session created successfully' : 'Session updated successfully',
-      data: {
-        id: session.id,
-        whatsappNumberId: session.whatsappNumberId,
-        whatsappNumber: session.whatsappNumber,
-        status: session.status,
-        qrCode: session.qrCode,
-        lastConnected: session.lastConnected,
-        isActive: session.isActive,
-        createdAt: session.createdAt,
-        updatedAt: session.updatedAt
-      }
-    });
   } catch (error) {
     console.error('Create/Update session error:', error);
     res.status(500).json({
@@ -298,12 +278,13 @@ export const updateSessionStatus = async (req: Request, res: Response): Promise<
 
 /**
  * Get QR code for session
- * @route GET /api/sessions/:sessionId/qr
+ * @route GET /api/v1/sessions/:sessionId/qr
  */
 export const getSessionQR = async (req: Request, res: Response): Promise<void> => {
   try {
     const { sessionId } = req.params;
 
+    // First check database
     const session = await prisma.whatsAppSession.findUnique({
       where: { id: sessionId },
       select: {
@@ -328,10 +309,20 @@ export const getSessionQR = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    if (!session.qrCode) {
+    // Try to get fresh QR from SessionManager if available
+    const liveQR = whatsappSessionManager.getSessionQR(sessionId);
+    const qrCode = liveQR || session.qrCode;
+
+    if (!qrCode) {
       res.status(404).json({
         success: false,
-        message: 'QR code not available for this session'
+        message: 'QR code not available for this session. Please create a new session if needed.',
+        details: {
+          status: session.status,
+          suggestion: session.status === SessionStatus.CONNECTED 
+            ? 'Session is already connected' 
+            : 'Session may be disconnected or expired'
+        }
       });
       return;
     }
@@ -341,9 +332,13 @@ export const getSessionQR = async (req: Request, res: Response): Promise<void> =
       message: 'QR code retrieved successfully',
       data: {
         sessionId: session.id,
-        whatsappNumber: session.whatsappNumber,
-        qrCode: session.qrCode,
-        status: session.status
+        whatsappNumber: {
+          ...session.whatsappNumber,
+          phoneNumberFormatted: formatPhoneForDisplay(session.whatsappNumber.phoneNumber)
+        },
+        qrCode: qrCode,
+        status: session.status,
+        isLive: !!liveQR // Indicates if QR is from live session
       }
     });
   } catch (error) {
@@ -357,7 +352,7 @@ export const getSessionQR = async (req: Request, res: Response): Promise<void> =
 
 /**
  * Deactivate session (soft delete)
- * @route DELETE /api/sessions/:sessionId
+ * @route DELETE /api/v1/sessions/:sessionId
  */
 export const deactivateSession = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -375,19 +370,32 @@ export const deactivateSession = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    await prisma.whatsAppSession.update({
-      where: { id: sessionId },
-      data: {
-        isActive: false,
-        status: SessionStatus.DISCONNECTED,
-        updatedAt: new Date()
-      }
-    });
+    try {
+      // Permanently disconnect through SessionManager (with logout)
+      await whatsappSessionManager.logoutSession(sessionId);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Session deactivated successfully'
+      });
+    } catch (error) {
+      console.error('SessionManager logout error:', error);
+      
+      // Fallback: update database directly if SessionManager fails
+      await prisma.whatsAppSession.update({
+        where: { id: sessionId },
+        data: {
+          isActive: false,
+          status: SessionStatus.DISCONNECTED,
+          updatedAt: new Date()
+        }
+      });
 
-    res.status(200).json({
-      success: true,
-      message: 'Session deactivated successfully'
-    });
+      res.status(200).json({
+        success: true,
+        message: 'Session deactivated successfully (fallback method)'
+      });
+    }
   } catch (error) {
     console.error('Deactivate session error:', error);
     res.status(500).json({
@@ -427,6 +435,81 @@ export const deleteSession = async (req: Request, res: Response): Promise<void> 
     });
   } catch (error) {
     console.error('Delete session error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+};
+
+/**
+ * Send message through session
+ * @route POST /api/v1/sessions/:sessionId/send
+ */
+export const sendMessage = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { sessionId } = req.params;
+    const { to, message } = req.body;
+
+    if (!to || !message) {
+      res.status(400).json({
+        success: false,
+        message: 'Recipient phone number and message are required'
+      });
+      return;
+    }
+
+    // Check if session exists in database
+    const session = await prisma.whatsAppSession.findUnique({
+      where: { id: sessionId },
+      include: { whatsappNumber: true }
+    });
+
+    if (!session) {
+      res.status(404).json({
+        success: false,
+        message: 'Session not found'
+      });
+      return;
+    }
+
+    if (!session.isActive) {
+      res.status(400).json({
+        success: false,
+        message: 'Session is not active'
+      });
+      return;
+    }
+
+    try {
+      // Send message through SessionManager
+      const result = await whatsappSessionManager.sendMessage(sessionId, to, message);
+      
+      res.status(200).json({
+        success: true,
+        message: 'Message sent successfully',
+        data: {
+          sessionId: sessionId,
+          from: {
+            id: session.whatsappNumber.id,
+            name: session.whatsappNumber.name,
+            phoneNumber: formatPhoneForDisplay(session.whatsappNumber.phoneNumber)
+          },
+          to: formatPhoneForDisplay(to),
+          message: message,
+          messageId: result.key?.id,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('Send message error:', error);
+      res.status(500).json({
+        success: false,
+        message: `Failed to send message: ${error}`
+      });
+    }
+  } catch (error) {
+    console.error('Send message controller error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
