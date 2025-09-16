@@ -40,6 +40,26 @@ enum SessionStatus {
   ERROR
 }
 
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+  LOCATION
+  CONTACT
+  STICKER
+  SYSTEM
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
 model WhatsAppNumber {
   id          Int      @id @default(autoincrement())
   name        String
@@ -49,6 +69,8 @@ model WhatsAppNumber {
 
   // Relation to sessions
   sessions WhatsAppSession[]
+  // Relation to chats where this number is the owner
+  chats    Chat[]
 
   @@map("whatsapp_numbers")
 }
@@ -72,4 +94,64 @@ model WhatsAppSession {
   @@index([whatsappNumberId])
   @@index([status])
   @@map("whatsapp_sessions")
+}
+
+model Chat {
+  id               String    @id @default(uuid())
+  whatsappNumberId Int // Which WhatsApp number owns this chat
+  contactJid       String // Contact's JID (e.g., 628123456789@s.whatsapp.net)
+  contactName      String? // Contact's display name
+  contactNumber    String // Contact's phone number (normalized)
+  isGroup          Boolean   @default(false)
+  groupName        String? // Group name if it's a group chat
+  lastMessageId    String? // ID of the last message
+  lastMessageText  String? // Preview of last message
+  lastMessageTime  DateTime? // Time of last message
+  unreadCount      Int       @default(0)
+  isPinned         Boolean   @default(false)
+  isArchived       Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)
+  messages       Message[]
+
+  @@unique([whatsappNumberId, contactJid])
+  @@index([whatsappNumberId])
+  @@index([lastMessageTime])
+  @@map("chats")
+}
+
+model Message {
+  id              String        @id @default(uuid())
+  chatId          String
+  messageId       String // WhatsApp message ID
+  fromJid         String // Sender's JID
+  fromNumber      String // Sender's phone number
+  fromName        String? // Sender's display name
+  toJid           String // Recipient's JID
+  toNumber        String // Recipient's phone number
+  type            MessageType   @default(TEXT)
+  content         String?       @db.Text // Message text content
+  mediaUrl        String? // URL for media files
+  mediaType       String? // MIME type for media
+  mediaSize       Int? // File size for media
+  mediaCaption    String? // Caption for media
+  quotedMessageId String? // ID of quoted message
+  quotedContent   String? // Content of quoted message
+  status          MessageStatus @default(PENDING)
+  isFromMe        Boolean // Whether message was sent by us
+  timestamp       DateTime // Message timestamp
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, chatId])
+  @@index([chatId])
+  @@index([timestamp])
+  @@index([fromJid])
+  @@map("messages")
 }

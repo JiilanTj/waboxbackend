@@ -8,12 +8,70 @@ const swaggerDefinition = {
   info: {
     title: 'WaBox Backend API',
     version: '1.0.0',
-    description: 'Backend API untuk aplikasi pengelola pesan WhatsApp multi-account dan multi-CS',
+    description: `
+Backend API untuk aplikasi pengelola pesan WhatsApp multi-account dan multi-CS.
+
+## Real-time Features 📡
+
+WaBox menggunakan Socket.io untuk fitur real-time seperti WhatsApp Web:
+
+- ✅ Real-time chat list updates
+- ✅ Live message notifications  
+- ✅ WhatsApp connection status
+- ✅ QR code real-time updates
+- ✅ Read status synchronization
+
+### Socket.io Connection
+\`\`\`javascript
+const socket = io('http://localhost:5000', {
+  auth: { token: 'your-jwt-token' }
+});
+\`\`\`
+
+### Key Events:
+- **chat:get-list** - Request chat list
+- **chat:get-history** - Request chat messages
+- **message:new** - New message received
+- **whatsapp:status** - Connection status updates
+- **whatsapp:qr** - QR code for pairing
+
+📖 **Dokumentasi lengkap**: [Real-time Documentation](https://github.com/palvia/wabox/docs/REALTIME.md)
+    `,
     contact: {
       name: 'Palvia',
       email: 'palvia@wabox.com'
     }
   },
+  tags: [
+    {
+      name: 'Authentication',
+      description: 'User authentication and authorization endpoints'
+    },
+    {
+      name: 'Users',
+      description: 'User management endpoints'
+    },
+    {
+      name: 'WhatsApp Numbers',
+      description: 'WhatsApp number management endpoints'
+    },
+    {
+      name: 'WhatsApp Sessions',
+      description: 'WhatsApp session management (connection, QR, messaging)'
+    },
+    {
+      name: 'Chat Management',
+      description: 'Chat list, message history, and chat operations'
+    },
+    {
+      name: 'Real-time',
+      description: 'Socket.io real-time features and testing endpoints'
+    },
+    {
+      name: 'Application',
+      description: 'General application endpoints (health check, etc.)'
+    }
+  ],
   servers: [
     {
       url: process.env.API_BASE_URL || 'http://localhost:5000',
@@ -22,7 +80,7 @@ const swaggerDefinition = {
   ],
   components: {
     securitySchemes: {
-      BearerAuth: {
+      bearerAuth: {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
@@ -271,6 +329,134 @@ const swaggerDefinition = {
           },
           pagination: {
             $ref: '#/components/schemas/PaginationMeta'
+          }
+        }
+      },
+      // Real-time schemas
+      SocketEvent: {
+        type: 'object',
+        properties: {
+          event: {
+            type: 'string',
+            description: 'Socket.io event name'
+          },
+          data: {
+            type: 'object',
+            description: 'Event payload'
+          }
+        }
+      },
+      ChatPreview: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description: 'Chat UUID'
+          },
+          contactName: {
+            type: 'string',
+            description: 'Contact display name'
+          },
+          contactNumber: {
+            type: 'string',
+            description: 'Contact phone number'
+          },
+          contactJid: {
+            type: 'string',
+            description: 'WhatsApp JID'
+          },
+          lastMessage: {
+            type: 'string',
+            description: 'Preview of last message'
+          },
+          lastMessageTime: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Timestamp of last message'
+          },
+          unreadCount: {
+            type: 'integer',
+            description: 'Number of unread messages'
+          },
+          isGroup: {
+            type: 'boolean',
+            description: 'Whether this is a group chat'
+          },
+          isPinned: {
+            type: 'boolean',
+            description: 'Whether chat is pinned'
+          },
+          isArchived: {
+            type: 'boolean',
+            description: 'Whether chat is archived'
+          }
+        }
+      },
+      MessageData: {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description: 'Message UUID'
+          },
+          messageId: {
+            type: 'string',
+            description: 'WhatsApp message ID'
+          },
+          fromJid: {
+            type: 'string',
+            description: 'Sender JID'
+          },
+          fromNumber: {
+            type: 'string',
+            description: 'Sender phone number'
+          },
+          fromName: {
+            type: 'string',
+            description: 'Sender display name'
+          },
+          content: {
+            type: 'string',
+            description: 'Message content'
+          },
+          type: {
+            type: 'string',
+            enum: ['TEXT', 'IMAGE', 'VIDEO', 'AUDIO', 'DOCUMENT', 'LOCATION', 'CONTACT', 'STICKER'],
+            description: 'Message type'
+          },
+          isFromMe: {
+            type: 'boolean',
+            description: 'Whether message was sent by us'
+          },
+          status: {
+            type: 'string',
+            enum: ['PENDING', 'SENT', 'DELIVERED', 'READ', 'FAILED'],
+            description: 'Message status'
+          },
+          timestamp: {
+            type: 'string',
+            format: 'date-time',
+            description: 'Message timestamp'
+          }
+        }
+      },
+      RealtimeStatus: {
+        type: 'object',
+        properties: {
+          socketService: {
+            type: 'string',
+            description: 'Socket.io service status'
+          },
+          connectedUsers: {
+            type: 'integer',
+            description: 'Number of connected users'
+          },
+          features: {
+            type: 'array',
+            items: {
+              type: 'string'
+            },
+            description: 'Available real-time features'
           }
         }
       }

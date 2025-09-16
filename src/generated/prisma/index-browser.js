@@ -153,6 +153,48 @@ exports.Prisma.WhatsAppSessionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatScalarFieldEnum = {
+  id: 'id',
+  whatsappNumberId: 'whatsappNumberId',
+  contactJid: 'contactJid',
+  contactName: 'contactName',
+  contactNumber: 'contactNumber',
+  isGroup: 'isGroup',
+  groupName: 'groupName',
+  lastMessageId: 'lastMessageId',
+  lastMessageText: 'lastMessageText',
+  lastMessageTime: 'lastMessageTime',
+  unreadCount: 'unreadCount',
+  isPinned: 'isPinned',
+  isArchived: 'isArchived',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  messageId: 'messageId',
+  fromJid: 'fromJid',
+  fromNumber: 'fromNumber',
+  fromName: 'fromName',
+  toJid: 'toJid',
+  toNumber: 'toNumber',
+  type: 'type',
+  content: 'content',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  mediaSize: 'mediaSize',
+  mediaCaption: 'mediaCaption',
+  quotedMessageId: 'quotedMessageId',
+  quotedContent: 'quotedContent',
+  status: 'status',
+  isFromMe: 'isFromMe',
+  timestamp: 'timestamp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -196,6 +238,33 @@ exports.Prisma.WhatsAppSessionOrderByRelevanceFieldEnum = {
   qrCode: 'qrCode',
   errorMessage: 'errorMessage'
 };
+
+exports.Prisma.ChatOrderByRelevanceFieldEnum = {
+  id: 'id',
+  contactJid: 'contactJid',
+  contactName: 'contactName',
+  contactNumber: 'contactNumber',
+  groupName: 'groupName',
+  lastMessageId: 'lastMessageId',
+  lastMessageText: 'lastMessageText'
+};
+
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  messageId: 'messageId',
+  fromJid: 'fromJid',
+  fromNumber: 'fromNumber',
+  fromName: 'fromName',
+  toJid: 'toJid',
+  toNumber: 'toNumber',
+  content: 'content',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  mediaCaption: 'mediaCaption',
+  quotedMessageId: 'quotedMessageId',
+  quotedContent: 'quotedContent'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
@@ -209,10 +278,32 @@ exports.SessionStatus = exports.$Enums.SessionStatus = {
   ERROR: 'ERROR'
 };
 
+exports.MessageType = exports.$Enums.MessageType = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  VIDEO: 'VIDEO',
+  AUDIO: 'AUDIO',
+  DOCUMENT: 'DOCUMENT',
+  LOCATION: 'LOCATION',
+  CONTACT: 'CONTACT',
+  STICKER: 'STICKER',
+  SYSTEM: 'SYSTEM'
+};
+
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   WhatsAppNumber: 'WhatsAppNumber',
-  WhatsAppSession: 'WhatsAppSession'
+  WhatsAppSession: 'WhatsAppSession',
+  Chat: 'Chat',
+  Message: 'Message'
 };
 
 /**

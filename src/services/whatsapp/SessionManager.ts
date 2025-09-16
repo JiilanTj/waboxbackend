@@ -18,17 +18,25 @@ import fs from 'fs';
 import QRCode from 'qrcode';
 import { PrismaClient, SessionStatus } from '../../generated/prisma';
 import { phoneToWhatsAppJID } from '../../utils/phoneUtils';
+import { chatService } from '../chat/ChatService';
+import { getSocketService } from '../socket/SocketService';
 
 const prisma = new PrismaClient();
 
-// Logger interface for Baileys
+// Logger interface for Baileys - Ultra Clean version
 const P = (level: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace') => ({
   level,
-  info: (...args: any[]) => console.log(...args),
-  error: (...args: any[]) => console.error(...args),  
-  warn: (...args: any[]) => console.warn(...args),
-  debug: () => {},
-  trace: () => {},
+  info: () => {}, // Completely disable info logs
+  error: (msg: string, ...args: any[]) => {
+    // Only log critical errors, filter out normal operation logs
+    const criticalErrors = ['Connection failed', 'Authentication failed', 'Socket error'];
+    if (criticalErrors.some(err => msg.includes(err))) {
+      console.error(`📱 WhatsApp Error:`, msg);
+    }
+  },
+  warn: () => {}, // Completely disable warn logs
+  debug: () => {}, // Completely disable debug
+  trace: () => {}, // Completely disable trace  
   child: () => P(level)
 });
 
@@ -129,12 +137,40 @@ export class WhatsAppSessionManager {
       // Load auth state
       const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
 
-      // Create socket connection
+      // Create socket connection with suppressed console output
+      const originalConsoleLog = console.log;
+      const originalConsoleInfo = console.info;
+      const originalConsoleWarn = console.warn;
+      
+      // Temporarily suppress Baileys console output during socket creation
+      console.log = (...args: any[]) => {
+        const msg = args.join(' ');
+        // Filter out Baileys noise
+        if (!msg.includes('connected to WA') && 
+            !msg.includes('logging in') && 
+            !msg.includes('offline messages') && 
+            !msg.includes('History sync') && 
+            !msg.includes('mutex') && 
+            !msg.includes('prekey') && 
+            !msg.includes('session') && 
+            !msg.includes('Closing')) {
+          originalConsoleLog(...args);
+        }
+      };
+      
+      console.info = () => {}; // Suppress all info
+      console.warn = () => {}; // Suppress all warnings during connection
+      
       const socket = makeWASocket({
         auth: state,
         printQRInTerminal: false,
         logger: P('error'),
       });
+
+      // Restore original console after socket creation
+      console.log = originalConsoleLog;
+      console.info = originalConsoleInfo;
+      console.warn = originalConsoleWarn;
 
       sessionData.socket = socket;
 
@@ -148,10 +184,21 @@ export class WhatsAppSessionManager {
 
       // Handle messages (for future message handling)
       socket.ev.on('messages.upsert', async (m: { messages: WAMessage[]; type: MessageUpsertType; requestId?: string }) => {
-        console.log('Received messages:', JSON.stringify(m, undefined, 2));
+        // Clean message logging - only show essential info
+        if (m.messages.length > 0) {
+          m.messages.forEach(msg => {
+            const from = msg.key.remoteJid?.replace('@s.whatsapp.net', '');
+            const isFromMe = msg.key.fromMe ? '(Sent)' : '(Received)';
+            const text = msg.message?.conversation || 
+                        msg.message?.extendedTextMessage?.text || 
+                        '[Media/Other]';
+            
+            console.log(`💬 Message ${isFromMe}: ${from} - ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
+          });
+        }
       });
 
-      console.log(`🔄 Connecting session ${sessionId} for phone ${sessionData.phoneNumber}`);
+      console.log(`🔄 Connecting WhatsApp: ${sessionData.phoneNumber}`);
 
     } catch (error) {
       console.error(`❌ Error connecting session ${sessionId}:`, error);
@@ -167,6 +214,7 @@ export class WhatsAppSessionManager {
     if (!sessionData) return;
 
     const { connection, lastDisconnect, qr } = update;
+    const socketService = getSocketService();
 
     if (qr) {
       // Generate QR code
@@ -185,9 +233,17 @@ export class WhatsAppSessionManager {
         });
 
         sessionData.status = SessionStatus.PAIRING;
-        console.log(`📱 QR Code generated for session ${sessionId}`);
+        console.log(`📱 QR Code ready for ${sessionData.phoneNumber}`);
+        
+        // Broadcast QR code via Socket.io
+        if (socketService) {
+          await socketService.broadcastQRCode(sessionData.whatsappNumberId, qrCodeDataURL);
+          await socketService.broadcastWhatsAppStatus(sessionData.whatsappNumberId, 'PAIRING', {
+            qrCode: qrCodeDataURL
+          });
+        }
       } catch (error) {
-        console.error(`❌ Error generating QR code for session ${sessionId}:`, error);
+        console.error(`❌ Error generating QR code for ${sessionData.phoneNumber}:`, error);
       }
     }
 
@@ -196,18 +252,34 @@ export class WhatsAppSessionManager {
       
       if (shouldReconnect && sessionData.retryCount < this.maxRetries) {
         sessionData.retryCount++;
-        console.log(`🔄 Reconnecting session ${sessionId} (attempt ${sessionData.retryCount})`);
+        console.log(`🔄 Reconnecting session for ${sessionData.phoneNumber} (attempt ${sessionData.retryCount}/${this.maxRetries})`);
+        
+        // Broadcast reconnecting status
+        if (socketService) {
+          await socketService.broadcastWhatsAppStatus(sessionData.whatsappNumberId, 'RECONNECTING', {
+            retryCount: sessionData.retryCount,
+            maxRetries: this.maxRetries
+          });
+        }
         
         setTimeout(() => {
           this.connectSession(sessionId);
         }, 5000); // Wait 5 seconds before retry
       } else {
-        console.log(`❌ Session ${sessionId} disconnected permanently`);
+        console.log(`❌ Session for ${sessionData.phoneNumber} disconnected permanently`);
         await this.updateSessionStatus(sessionId, SessionStatus.DISCONNECTED, 'Connection closed');
+        
+        // Broadcast disconnection via Socket.io
+        if (socketService) {
+          await socketService.broadcastWhatsAppStatus(sessionData.whatsappNumberId, 'DISCONNECTED', {
+            reason: 'Connection closed'
+          });
+        }
+        
         this.sessions.delete(sessionId);
       }
     } else if (connection === 'open') {
-      console.log(`✅ Session ${sessionId} connected successfully`);
+      console.log(`✅ WhatsApp connected: ${sessionData.phoneNumber}`);
       sessionData.status = SessionStatus.CONNECTED;
       sessionData.retryCount = 0;
       sessionData.qrCode = null; // Clear QR code after successful connection
@@ -223,6 +295,14 @@ export class WhatsAppSessionManager {
           updatedAt: new Date()
         }
       });
+      
+      // Broadcast successful connection via Socket.io
+      if (socketService) {
+        await socketService.broadcastWhatsAppStatus(sessionData.whatsappNumberId, 'CONNECTED', {
+          lastConnected: new Date(),
+          phoneNumber: sessionData.phoneNumber
+        });
+      }
     }
   }
 
@@ -278,11 +358,11 @@ export class WhatsAppSessionManager {
       if (forceLogout) {
         // Hard disconnect - logout and clear credentials
         await sessionData.socket.logout();
-        console.log(`🔌 Session ${sessionId} logged out permanently`);
+        console.log(`🔌 ${sessionData.phoneNumber} logged out permanently`);
       } else {
         // Soft disconnect - just close connection, keep credentials
         sessionData.socket.end(undefined);
-        console.log(`🔌 Session ${sessionId} disconnected (keeping credentials)`);
+        console.log(`🔌 ${sessionData.phoneNumber} disconnected (credentials saved)`);
       }
       sessionData.socket = null;
     }
@@ -373,11 +453,11 @@ export class WhatsAppSessionManager {
         this.sessions.set(dbSession.id, sessionData);
         
         // Try to reconnect existing sessions
-        console.log(`🔄 Reconnecting existing session ${dbSession.id}`);
+        console.log(`🔄 Reconnecting ${dbSession.whatsappNumber.phoneNumber}`);
         await this.connectSession(dbSession.id);
       }
 
-      console.log(`✅ Initialized ${activeSessions.length} existing sessions`);
+      console.log(`✅ Initialized ${activeSessions.length} WhatsApp session(s)`);
     } catch (error) {
       console.error('❌ Error initializing existing sessions:', error);
     }
@@ -389,18 +469,18 @@ export class WhatsAppSessionManager {
   async cleanup(): Promise<void> {
     const sessionIds = Array.from(this.sessions.keys());
     
-    console.log(`🔄 Gracefully disconnecting ${sessionIds.length} sessions (keeping credentials)...`);
+    console.log(`🔄 Gracefully disconnecting ${sessionIds.length} WhatsApp session(s)...`);
     
     for (const sessionId of sessionIds) {
       try {
         // Soft disconnect - don't logout, just close connections
         await this.disconnectSession(sessionId, false);
       } catch (error) {
-        console.error(`❌ Error disconnecting session ${sessionId} during cleanup:`, error);
+        console.error(`❌ Error disconnecting session during cleanup:`, error);
       }
     }
     
-    console.log('✅ All sessions gracefully disconnected (credentials preserved)');
+    console.log('✅ All WhatsApp sessions gracefully disconnected (credentials preserved)');
   }
 
   /**

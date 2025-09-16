@@ -125,6 +125,48 @@ exports.Prisma.WhatsAppSessionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatScalarFieldEnum = {
+  id: 'id',
+  whatsappNumberId: 'whatsappNumberId',
+  contactJid: 'contactJid',
+  contactName: 'contactName',
+  contactNumber: 'contactNumber',
+  isGroup: 'isGroup',
+  groupName: 'groupName',
+  lastMessageId: 'lastMessageId',
+  lastMessageText: 'lastMessageText',
+  lastMessageTime: 'lastMessageTime',
+  unreadCount: 'unreadCount',
+  isPinned: 'isPinned',
+  isArchived: 'isArchived',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  messageId: 'messageId',
+  fromJid: 'fromJid',
+  fromNumber: 'fromNumber',
+  fromName: 'fromName',
+  toJid: 'toJid',
+  toNumber: 'toNumber',
+  type: 'type',
+  content: 'content',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  mediaSize: 'mediaSize',
+  mediaCaption: 'mediaCaption',
+  quotedMessageId: 'quotedMessageId',
+  quotedContent: 'quotedContent',
+  status: 'status',
+  isFromMe: 'isFromMe',
+  timestamp: 'timestamp',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -168,6 +210,33 @@ exports.Prisma.WhatsAppSessionOrderByRelevanceFieldEnum = {
   qrCode: 'qrCode',
   errorMessage: 'errorMessage'
 };
+
+exports.Prisma.ChatOrderByRelevanceFieldEnum = {
+  id: 'id',
+  contactJid: 'contactJid',
+  contactName: 'contactName',
+  contactNumber: 'contactNumber',
+  groupName: 'groupName',
+  lastMessageId: 'lastMessageId',
+  lastMessageText: 'lastMessageText'
+};
+
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  chatId: 'chatId',
+  messageId: 'messageId',
+  fromJid: 'fromJid',
+  fromNumber: 'fromNumber',
+  fromName: 'fromName',
+  toJid: 'toJid',
+  toNumber: 'toNumber',
+  content: 'content',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType',
+  mediaCaption: 'mediaCaption',
+  quotedMessageId: 'quotedMessageId',
+  quotedContent: 'quotedContent'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
@@ -181,10 +250,32 @@ exports.SessionStatus = exports.$Enums.SessionStatus = {
   ERROR: 'ERROR'
 };
 
+exports.MessageType = exports.$Enums.MessageType = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  VIDEO: 'VIDEO',
+  AUDIO: 'AUDIO',
+  DOCUMENT: 'DOCUMENT',
+  LOCATION: 'LOCATION',
+  CONTACT: 'CONTACT',
+  STICKER: 'STICKER',
+  SYSTEM: 'SYSTEM'
+};
+
+exports.MessageStatus = exports.$Enums.MessageStatus = {
+  PENDING: 'PENDING',
+  SENT: 'SENT',
+  DELIVERED: 'DELIVERED',
+  READ: 'READ',
+  FAILED: 'FAILED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   WhatsAppNumber: 'WhatsAppNumber',
-  WhatsAppSession: 'WhatsAppSession'
+  WhatsAppSession: 'WhatsAppSession',
+  Chat: 'Chat',
+  Message: 'Message'
 };
 /**
  * Create the Client
@@ -233,13 +324,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum UserRole {\n  USER\n  ADMIN\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String\n  username  String   @unique\n  email     String   @unique\n  role      UserRole @default(USER)\n  password  String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nenum SessionStatus {\n  PENDING\n  CONNECTED\n  DISCONNECTED\n  PAIRING\n  ERROR\n}\n\nmodel WhatsAppNumber {\n  id          Int      @id @default(autoincrement())\n  name        String\n  phoneNumber String   @unique\n  isActive    Boolean  @default(false)\n  createdAt   DateTime @default(now())\n\n  // Relation to sessions\n  sessions WhatsAppSession[]\n\n  @@map(\"whatsapp_numbers\")\n}\n\nmodel WhatsAppSession {\n  id               String        @id @default(uuid())\n  whatsappNumberId Int\n  sessionData      Json? // Baileys session data (encrypted)\n  qrCode           String?       @db.Text // QR Code base64 string\n  status           SessionStatus @default(PENDING)\n  lastConnected    DateTime?\n  isActive         Boolean       @default(false)\n  connectionInfo   Json? // Additional connection metadata\n  errorMessage     String?       @db.Text\n  createdAt        DateTime      @default(now())\n  updatedAt        DateTime      @updatedAt\n\n  // Relations\n  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)\n\n  @@index([whatsappNumberId])\n  @@index([status])\n  @@map(\"whatsapp_sessions\")\n}\n",
-  "inlineSchemaHash": "ba79a029ee16233461eb5ecb40cf547850e5445af1be95e8255c2a6cb12da33c",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum UserRole {\n  USER\n  ADMIN\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  name      String\n  username  String   @unique\n  email     String   @unique\n  role      UserRole @default(USER)\n  password  String\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"users\")\n}\n\nenum SessionStatus {\n  PENDING\n  CONNECTED\n  DISCONNECTED\n  PAIRING\n  ERROR\n}\n\nenum MessageType {\n  TEXT\n  IMAGE\n  VIDEO\n  AUDIO\n  DOCUMENT\n  LOCATION\n  CONTACT\n  STICKER\n  SYSTEM\n}\n\nenum MessageStatus {\n  PENDING\n  SENT\n  DELIVERED\n  READ\n  FAILED\n}\n\nmodel WhatsAppNumber {\n  id          Int      @id @default(autoincrement())\n  name        String\n  phoneNumber String   @unique\n  isActive    Boolean  @default(false)\n  createdAt   DateTime @default(now())\n\n  // Relation to sessions\n  sessions WhatsAppSession[]\n  // Relation to chats where this number is the owner\n  chats    Chat[]\n\n  @@map(\"whatsapp_numbers\")\n}\n\nmodel WhatsAppSession {\n  id               String        @id @default(uuid())\n  whatsappNumberId Int\n  sessionData      Json? // Baileys session data (encrypted)\n  qrCode           String?       @db.Text // QR Code base64 string\n  status           SessionStatus @default(PENDING)\n  lastConnected    DateTime?\n  isActive         Boolean       @default(false)\n  connectionInfo   Json? // Additional connection metadata\n  errorMessage     String?       @db.Text\n  createdAt        DateTime      @default(now())\n  updatedAt        DateTime      @updatedAt\n\n  // Relations\n  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)\n\n  @@index([whatsappNumberId])\n  @@index([status])\n  @@map(\"whatsapp_sessions\")\n}\n\nmodel Chat {\n  id               String    @id @default(uuid())\n  whatsappNumberId Int // Which WhatsApp number owns this chat\n  contactJid       String // Contact's JID (e.g., 628123456789@s.whatsapp.net)\n  contactName      String? // Contact's display name\n  contactNumber    String // Contact's phone number (normalized)\n  isGroup          Boolean   @default(false)\n  groupName        String? // Group name if it's a group chat\n  lastMessageId    String? // ID of the last message\n  lastMessageText  String? // Preview of last message\n  lastMessageTime  DateTime? // Time of last message\n  unreadCount      Int       @default(0)\n  isPinned         Boolean   @default(false)\n  isArchived       Boolean   @default(false)\n  createdAt        DateTime  @default(now())\n  updatedAt        DateTime  @updatedAt\n\n  // Relations\n  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)\n  messages       Message[]\n\n  @@unique([whatsappNumberId, contactJid])\n  @@index([whatsappNumberId])\n  @@index([lastMessageTime])\n  @@map(\"chats\")\n}\n\nmodel Message {\n  id              String        @id @default(uuid())\n  chatId          String\n  messageId       String // WhatsApp message ID\n  fromJid         String // Sender's JID\n  fromNumber      String // Sender's phone number\n  fromName        String? // Sender's display name\n  toJid           String // Recipient's JID\n  toNumber        String // Recipient's phone number\n  type            MessageType   @default(TEXT)\n  content         String?       @db.Text // Message text content\n  mediaUrl        String? // URL for media files\n  mediaType       String? // MIME type for media\n  mediaSize       Int? // File size for media\n  mediaCaption    String? // Caption for media\n  quotedMessageId String? // ID of quoted message\n  quotedContent   String? // Content of quoted message\n  status          MessageStatus @default(PENDING)\n  isFromMe        Boolean // Whether message was sent by us\n  timestamp       DateTime // Message timestamp\n  createdAt       DateTime      @default(now())\n  updatedAt       DateTime      @updatedAt\n\n  // Relations\n  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)\n\n  @@unique([messageId, chatId])\n  @@index([chatId])\n  @@index([timestamp])\n  @@index([fromJid])\n  @@map(\"messages\")\n}\n",
+  "inlineSchemaHash": "e53bc3c98ec70885ba8c4687c2fd43b39f39d282f3f98006fce575ee392942bd",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"WhatsAppNumber\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"WhatsAppSession\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"}],\"dbName\":\"whatsapp_numbers\"},\"WhatsAppSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatsappNumberId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sessionData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"qrCode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SessionStatus\"},{\"name\":\"lastConnected\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"connectionInfo\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"errorMessage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"whatsappNumber\",\"kind\":\"object\",\"type\":\"WhatsAppNumber\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"}],\"dbName\":\"whatsapp_sessions\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"username\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"enum\",\"type\":\"UserRole\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"users\"},\"WhatsAppNumber\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phoneNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"sessions\",\"kind\":\"object\",\"type\":\"WhatsAppSession\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"},{\"name\":\"chats\",\"kind\":\"object\",\"type\":\"Chat\",\"relationName\":\"ChatToWhatsAppNumber\"}],\"dbName\":\"whatsapp_numbers\"},\"WhatsAppSession\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatsappNumberId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sessionData\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"qrCode\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SessionStatus\"},{\"name\":\"lastConnected\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"isActive\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"connectionInfo\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"errorMessage\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"whatsappNumber\",\"kind\":\"object\",\"type\":\"WhatsAppNumber\",\"relationName\":\"WhatsAppNumberToWhatsAppSession\"}],\"dbName\":\"whatsapp_sessions\"},\"Chat\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"whatsappNumberId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"contactJid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contactName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contactNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"isGroup\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"groupName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastMessageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastMessageText\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lastMessageTime\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"unreadCount\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"isPinned\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isArchived\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"whatsappNumber\",\"kind\":\"object\",\"type\":\"WhatsAppNumber\",\"relationName\":\"ChatToWhatsAppNumber\"},{\"name\":\"messages\",\"kind\":\"object\",\"type\":\"Message\",\"relationName\":\"ChatToMessage\"}],\"dbName\":\"chats\"},\"Message\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"chatId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"messageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fromJid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fromNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fromName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"toJid\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"toNumber\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"type\",\"kind\":\"enum\",\"type\":\"MessageType\"},{\"name\":\"content\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mediaUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mediaType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"mediaSize\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"mediaCaption\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quotedMessageId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"quotedContent\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"MessageStatus\"},{\"name\":\"isFromMe\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"timestamp\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"chat\",\"kind\":\"object\",\"type\":\"Chat\",\"relationName\":\"ChatToMessage\"}],\"dbName\":\"messages\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
