@@ -27,11 +27,12 @@ const prisma = new PrismaClient();
 const P = (level: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace') => ({
   level,
   info: () => {}, // Completely disable info logs
-  error: (msg: string, ...args: any[]) => {
+  error: (msg: any, ...args: any[]) => {
     // Only log critical errors, filter out normal operation logs
     const criticalErrors = ['Connection failed', 'Authentication failed', 'Socket error'];
-    if (criticalErrors.some(err => msg.includes(err))) {
-      console.error(`📱 WhatsApp Error:`, msg);
+    const msgStr = typeof msg === 'string' ? msg : String(msg);
+    if (criticalErrors.some(err => msgStr.includes(err))) {
+      console.error(`📱 WhatsApp Error:`, msgStr);
     }
   },
   warn: () => {}, // Completely disable warn logs
@@ -123,7 +124,8 @@ export class WhatsAppSessionManager {
   async connectSession(sessionId: string): Promise<void> {
     const sessionData = this.sessions.get(sessionId);
     if (!sessionData) {
-      throw new Error('Session not found');
+      console.log(`⚠️  Session ${sessionId} not found, likely disconnected permanently`);
+      return; // Don't throw error, just return silently
     }
 
     try {
@@ -263,7 +265,12 @@ export class WhatsAppSessionManager {
         }
         
         setTimeout(() => {
-          this.connectSession(sessionId);
+          // Check if session still exists before reconnecting
+          if (this.sessions.has(sessionId)) {
+            this.connectSession(sessionId);
+          } else {
+            console.log(`⚠️  Session ${sessionId} was removed, skipping reconnection`);
+          }
         }, 5000); // Wait 5 seconds before retry
       } else {
         console.log(`❌ Session for ${sessionData.phoneNumber} disconnected permanently`);

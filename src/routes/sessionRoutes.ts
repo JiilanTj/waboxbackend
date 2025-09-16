@@ -9,7 +9,7 @@ import {
   deleteSession,
   sendMessage
 } from '../controllers/sessionController';
-import { authenticateToken, requireAdmin } from '../utils/middleware';
+import { authenticateToken } from '../utils/middleware';
 
 const router = Router();
 
@@ -175,7 +175,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/api/v1/sessions/:whatsappNumberId', authenticateToken, requireAdmin, createOrUpdateSession);
+router.post('/api/v1/sessions/:whatsappNumberId', authenticateToken, createOrUpdateSession);
 router.get('/api/v1/sessions/:whatsappNumberId', authenticateToken, getSessionByWhatsappNumber);
 
 /**
@@ -244,7 +244,7 @@ router.get('/api/v1/sessions/:whatsappNumberId', authenticateToken, getSessionBy
  *       500:
  *         description: Internal server error
  */
-router.get('/api/v1/sessions', authenticateToken, requireAdmin, getAllSessions);
+router.get('/api/v1/sessions', authenticateToken, getAllSessions);
 
 /**
  * @swagger
@@ -293,7 +293,7 @@ router.get('/api/v1/sessions', authenticateToken, requireAdmin, getAllSessions);
  *       500:
  *         description: Internal server error
  */
-router.patch('/api/v1/sessions/:sessionId/status', authenticateToken, requireAdmin, updateSessionStatus);
+router.patch('/api/v1/sessions/:sessionId/status', authenticateToken, updateSessionStatus);
 
 /**
  * @swagger
@@ -380,7 +380,7 @@ router.get('/api/v1/sessions/:sessionId/qr', authenticateToken, getSessionQR);
  *       500:
  *         description: Internal server error
  */
-router.delete('/api/v1/sessions/:sessionId', authenticateToken, requireAdmin, deactivateSession);
+router.delete('/api/v1/sessions/:sessionId', authenticateToken, deactivateSession);
 
 /**
  * @swagger
@@ -419,7 +419,7 @@ router.delete('/api/v1/sessions/:sessionId', authenticateToken, requireAdmin, de
  *       500:
  *         description: Internal server error
  */
-router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, requireAdmin, deleteSession);
+router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, deleteSession);
 
 /**
  * @swagger
@@ -501,6 +501,6 @@ router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, requir
  *       500:
  *         description: Internal server error or failed to send message
  */
-router.post('/api/v1/sessions/:sessionId/send', authenticateToken, requireAdmin, sendMessage);
+router.post('/api/v1/sessions/:sessionId/send', authenticateToken, sendMessage);
 
 export default router;

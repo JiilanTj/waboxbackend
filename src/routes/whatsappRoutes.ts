@@ -7,7 +7,7 @@ import {
   deleteWhatsAppNumber,
   toggleWhatsAppNumberStatus
 } from '../controllers/whatsappController';
-import { authenticateToken, requireAdmin } from '../utils/middleware';
+import { authenticateToken } from '../utils/middleware';
 
 const router = Router();
 
@@ -143,7 +143,7 @@ router.get('/api/v1/whatsapp', getWhatsAppNumbers);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/api/v1/whatsapp', requireAdmin, createWhatsAppNumber);
+router.post('/api/v1/whatsapp', createWhatsAppNumber);
 
 /**
  * @swagger
@@ -282,7 +282,7 @@ router.get('/api/v1/whatsapp/:id', getWhatsAppNumberById);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.put('/api/v1/whatsapp/:id', requireAdmin, updateWhatsAppNumber);
+router.put('/api/v1/whatsapp/:id', updateWhatsAppNumber);
 
 /**
  * @swagger
@@ -342,7 +342,7 @@ router.put('/api/v1/whatsapp/:id', requireAdmin, updateWhatsAppNumber);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete('/api/v1/whatsapp/:id', requireAdmin, deleteWhatsAppNumber);
+router.delete('/api/v1/whatsapp/:id', deleteWhatsAppNumber);
 
 /**
  * @swagger
@@ -404,6 +404,6 @@ router.delete('/api/v1/whatsapp/:id', requireAdmin, deleteWhatsAppNumber);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/api/v1/whatsapp/:id/toggle-status', requireAdmin, toggleWhatsAppNumberStatus);
+router.patch('/api/v1/whatsapp/:id/toggle-status', toggleWhatsAppNumberStatus);
 
 export default router;
