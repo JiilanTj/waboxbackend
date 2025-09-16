@@ -49,6 +49,19 @@ export class ChatService {
       
       if (!messageId || !fromJid) return;
 
+      // Check if message already exists to prevent duplicates
+      const existingMessage = await prisma.message.findFirst({
+        where: {
+          messageId: messageId,
+          fromJid: fromJid
+        }
+      });
+
+      if (existingMessage) {
+        console.log(`⚠️  Message already exists, skipping: ${messageId}`);
+        return;
+      }
+
       // Extract message content
       const messageContent = this.extractMessageContent(message);
       const timestamp = new Date((message.messageTimestamp as number) * 1000);

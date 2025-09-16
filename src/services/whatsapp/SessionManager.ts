@@ -17,7 +17,7 @@ import path from 'path';
 import fs from 'fs';
 import QRCode from 'qrcode';
 import { PrismaClient, SessionStatus } from '../../generated/prisma';
-import { phoneToWhatsAppJID } from '../../utils/phoneUtils';
+import { phoneToWhatsAppJID, jidToPhoneNumber } from '../../utils/phoneUtils';
 import { chatService } from '../chat/ChatService';
 import { getSocketService } from '../socket/SocketService';
 
@@ -184,19 +184,29 @@ export class WhatsAppSessionManager {
       // Save credentials when updated
       socket.ev.on('creds.update', saveCreds);
 
-      // Handle messages (for future message handling)
+      // Handle messages - Store in database and broadcast real-time
       socket.ev.on('messages.upsert', async (m: { messages: WAMessage[]; type: MessageUpsertType; requestId?: string }) => {
-        // Clean message logging - only show essential info
-        if (m.messages.length > 0) {
-          m.messages.forEach(msg => {
-            const from = msg.key.remoteJid?.replace('@s.whatsapp.net', '');
-            const isFromMe = msg.key.fromMe ? '(Sent)' : '(Received)';
-            const text = msg.message?.conversation || 
-                        msg.message?.extendedTextMessage?.text || 
-                        '[Media/Other]';
-            
-            console.log(`💬 Message ${isFromMe}: ${from} - ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
-          });
+        // Process each message immediately
+        for (const msg of m.messages) {
+          try {
+            // Only process non-status messages
+            if (msg.key.remoteJid && !msg.key.remoteJid.includes('status@broadcast')) {
+              // Extract basic info for logging
+              const from = msg.key.remoteJid?.replace('@s.whatsapp.net', '');
+              const isFromMe = msg.key.fromMe ? '(Sent)' : '(Received)';
+              const text = msg.message?.conversation || 
+                          msg.message?.extendedTextMessage?.text || 
+                          '[Media/Other]';
+              
+              console.log(`💬 Message ${isFromMe}: ${from} - ${text.substring(0, 50)}${text.length > 50 ? '...' : ''}`);
+              
+              // Store in database immediately via ChatService
+              await chatService.processIncomingMessage(sessionData.whatsappNumberId, msg);
+              
+            }
+          } catch (error) {
+            console.error(`❌ Error processing message:`, error);
+          }
         }
       });
 
@@ -421,6 +431,23 @@ export class WhatsAppSessionManager {
     try {
       const jid = phoneToWhatsAppJID(to);
       const result = await sessionData.socket.sendMessage(jid, { text: message });
+      
+      // Store sent message in database via ChatService
+      if (result) {
+        try {
+          await chatService.processSentMessage(
+            sessionData.whatsappNumberId,
+            jid,
+            message,
+            result.key.id || undefined
+          );
+          console.log(`💾 Sent message stored: ${jidToPhoneNumber(jid) || to} - ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}`);
+        } catch (dbError) {
+          console.error(`❌ Error storing sent message:`, dbError);
+          // Don't throw error here, message was sent successfully
+        }
+      }
+      
       return result;
     } catch (error) {
       console.error(`❌ Error sending message from session ${sessionId}:`, error);

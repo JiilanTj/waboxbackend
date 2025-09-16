@@ -43,23 +43,39 @@ export class SocketService {
     try {
       const token = socket.handshake.auth.token;
       
+      console.log(`🔐 Socket auth attempt: ${socket.id}, token: ${token ? 'present' : 'missing'}`);
+      
       if (!token) {
+        console.log('❌ Socket auth failed: No token provided');
         return next(new Error('Authentication required'));
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+      console.log(`🔍 Decoded JWT:`, { userId: decoded.userId, username: decoded.username });
       
-      // Get user's WhatsApp numbers
+      // Fix: Use decoded.userId instead of decoded.id
+      if (!decoded.userId) {
+        console.log('❌ Socket auth failed: No userId in token');
+        return next(new Error('Invalid token: missing userId'));
+      }
+
+      // Get user's WhatsApp numbers (filter by actual user ownership if needed)
       const whatsappNumbers = await prisma.whatsAppNumber.findMany({
-        where: { isActive: true },
+        where: { 
+          isActive: true,
+          // TODO: Add user ownership filter if WhatsApp numbers belong to specific users
+          // userId: decoded.userId 
+        },
         select: { id: true }
       });
 
-      socket.userId = decoded.id;
+      socket.userId = decoded.userId;
       socket.whatsappNumberIds = whatsappNumbers.map(num => num.id);
       
+      console.log(`✅ Socket auth success: User ${decoded.userId} connected with ${whatsappNumbers.length} WhatsApp numbers`);
       next();
     } catch (error) {
+      console.log('❌ Socket auth failed:', error instanceof Error ? error.message : String(error));
       next(new Error('Invalid token'));
     }
   }
@@ -68,7 +84,13 @@ export class SocketService {
    * Handle user connection
    */
   private handleConnection(socket: AuthenticatedSocket) {
-    if (!socket.userId) return;
+    if (!socket.userId) {
+      console.log(`❌ Connection rejected: No userId for socket ${socket.id}`);
+      socket.disconnect(true);
+      return;
+    }
+
+    console.log(`🎯 Setting up connection for User ${socket.userId} (${socket.id})`);
 
     // Store user room info
     this.userRooms.set(socket.id, {
@@ -79,9 +101,11 @@ export class SocketService {
     // Join user to their rooms (based on their WhatsApp numbers)
     socket.whatsappNumberIds?.forEach(whatsappNumberId => {
       socket.join(`whatsapp:${whatsappNumberId}`);
+      console.log(`📡 User ${socket.userId} joined room: whatsapp:${whatsappNumberId}`);
     });
 
     // Send initial chat list
+    console.log(`📋 Sending initial chat list to User ${socket.userId}`);
     this.sendInitialChatList(socket);
   }
 
@@ -89,9 +113,14 @@ export class SocketService {
    * Handle user disconnection
    */
   private handleDisconnection(socket: AuthenticatedSocket) {
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
       console.log(`🔌 User disconnected: ${socket.id} (User ID: ${socket.userId})`);
+      console.log(`❓ Disconnect reason: ${reason}`);
       this.userRooms.delete(socket.id);
+    });
+
+    socket.on('error', (error) => {
+      console.log(`❌ Socket error for ${socket.id}:`, error);
     });
   }
 
@@ -230,21 +259,35 @@ export class SocketService {
    */
   private async sendInitialChatList(socket: AuthenticatedSocket) {
     try {
-      if (!socket.whatsappNumberIds) return;
+      if (!socket.whatsappNumberIds || socket.whatsappNumberIds.length === 0) {
+        console.log(`⚠️  No WhatsApp numbers for user ${socket.userId}, skipping initial chat list`);
+        return;
+      }
 
       const { ChatService } = await import('../chat/ChatService');
       const chatService = new ChatService();
 
+      console.log(`📊 Loading initial chat list for ${socket.whatsappNumberIds.length} WhatsApp numbers...`);
+
       for (const whatsappNumberId of socket.whatsappNumberIds) {
+        console.log(`📋 Loading chat list for WhatsApp number ${whatsappNumberId}...`);
+        
         const chatList = await chatService.getChatList(whatsappNumberId, 20, 0);
+        
+        console.log(`✅ Found ${chatList.length} chats for WhatsApp number ${whatsappNumberId}`);
         
         socket.emit('chat:list', {
           whatsappNumberId,
           chats: chatList
         });
+        
+        console.log(`📤 Sent chat list to user ${socket.userId} for WhatsApp ${whatsappNumberId}`);
       }
+      
+      console.log(`🎉 Initial chat list sending completed for user ${socket.userId}`);
     } catch (error) {
-      console.error('Error sending initial chat list:', error);
+      console.error(`❌ Error sending initial chat list to user ${socket.userId}:`, error instanceof Error ? error.message : String(error));
+      // Don't disconnect on error, just log it
     }
   }
 
