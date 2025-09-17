@@ -195,6 +195,14 @@ exports.Prisma.MessageScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.WaNumberPermissionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  whatsappNumberId: 'whatsappNumberId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -303,7 +311,8 @@ exports.Prisma.ModelName = {
   WhatsAppNumber: 'WhatsAppNumber',
   WhatsAppSession: 'WhatsAppSession',
   Chat: 'Chat',
-  Message: 'Message'
+  Message: 'Message',
+  WaNumberPermission: 'WaNumberPermission'
 };
 
 /**

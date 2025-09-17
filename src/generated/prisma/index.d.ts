@@ -38,6 +38,11 @@ export type Chat = $Result.DefaultSelection<Prisma.$ChatPayload>
  * 
  */
 export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
+/**
+ * Model WaNumberPermission
+ * 
+ */
+export type WaNumberPermission = $Result.DefaultSelection<Prisma.$WaNumberPermissionPayload>
 
 /**
  * Enums
@@ -272,6 +277,16 @@ export class PrismaClient<
     * ```
     */
   get message(): Prisma.MessageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.waNumberPermission`: Exposes CRUD operations for the **WaNumberPermission** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WaNumberPermissions
+    * const waNumberPermissions = await prisma.waNumberPermission.findMany()
+    * ```
+    */
+  get waNumberPermission(): Prisma.WaNumberPermissionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -716,7 +731,8 @@ export namespace Prisma {
     WhatsAppNumber: 'WhatsAppNumber',
     WhatsAppSession: 'WhatsAppSession',
     Chat: 'Chat',
-    Message: 'Message'
+    Message: 'Message',
+    WaNumberPermission: 'WaNumberPermission'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -735,7 +751,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "whatsAppNumber" | "whatsAppSession" | "chat" | "message"
+      modelProps: "user" | "whatsAppNumber" | "whatsAppSession" | "chat" | "message" | "waNumberPermission"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1069,6 +1085,72 @@ export namespace Prisma {
           }
         }
       }
+      WaNumberPermission: {
+        payload: Prisma.$WaNumberPermissionPayload<ExtArgs>
+        fields: Prisma.WaNumberPermissionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WaNumberPermissionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WaNumberPermissionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          findFirst: {
+            args: Prisma.WaNumberPermissionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WaNumberPermissionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          findMany: {
+            args: Prisma.WaNumberPermissionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>[]
+          }
+          create: {
+            args: Prisma.WaNumberPermissionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          createMany: {
+            args: Prisma.WaNumberPermissionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.WaNumberPermissionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          update: {
+            args: Prisma.WaNumberPermissionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          deleteMany: {
+            args: Prisma.WaNumberPermissionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WaNumberPermissionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.WaNumberPermissionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WaNumberPermissionPayload>
+          }
+          aggregate: {
+            args: Prisma.WaNumberPermissionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWaNumberPermission>
+          }
+          groupBy: {
+            args: Prisma.WaNumberPermissionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WaNumberPermissionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WaNumberPermissionCountArgs<ExtArgs>
+            result: $Utils.Optional<WaNumberPermissionCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1170,6 +1252,7 @@ export namespace Prisma {
     whatsAppSession?: WhatsAppSessionOmit
     chat?: ChatOmit
     message?: MessageOmit
+    waNumberPermission?: WaNumberPermissionOmit
   }
 
   /* Types for Logging */
@@ -1246,17 +1329,50 @@ export namespace Prisma {
 
 
   /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    whatsappPermissions: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    whatsappPermissions?: boolean | UserCountOutputTypeCountWhatsappPermissionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountWhatsappPermissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WaNumberPermissionWhereInput
+  }
+
+
+  /**
    * Count Type WhatsAppNumberCountOutputType
    */
 
   export type WhatsAppNumberCountOutputType = {
     sessions: number
     chats: number
+    permissions: number
   }
 
   export type WhatsAppNumberCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | WhatsAppNumberCountOutputTypeCountSessionsArgs
     chats?: boolean | WhatsAppNumberCountOutputTypeCountChatsArgs
+    permissions?: boolean | WhatsAppNumberCountOutputTypeCountPermissionsArgs
   }
 
   // Custom InputTypes
@@ -1282,6 +1398,13 @@ export namespace Prisma {
    */
   export type WhatsAppNumberCountOutputTypeCountChatsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ChatWhereInput
+  }
+
+  /**
+   * WhatsAppNumberCountOutputType without action
+   */
+  export type WhatsAppNumberCountOutputTypeCountPermissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WaNumberPermissionWhereInput
   }
 
 
@@ -1542,6 +1665,8 @@ export namespace Prisma {
     password?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    whatsappPermissions?: boolean | User$whatsappPermissionsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
 
@@ -1558,10 +1683,16 @@ export namespace Prisma {
   }
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "email" | "role" | "password" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    whatsappPermissions?: boolean | User$whatsappPermissionsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+  }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {}
+    objects: {
+      whatsappPermissions: Prisma.$WaNumberPermissionPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       name: string
@@ -1911,6 +2042,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    whatsappPermissions<T extends User$whatsappPermissionsArgs<ExtArgs> = {}>(args?: Subset<T, User$whatsappPermissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1965,6 +2097,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1983,6 +2119,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -2000,6 +2140,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -2049,6 +2193,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -2097,6 +2245,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -2140,6 +2292,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The data needed to create a User.
      */
     data: XOR<UserCreateInput, UserUncheckedCreateInput>
@@ -2168,6 +2324,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -2209,6 +2369,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -2235,6 +2399,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -2255,6 +2423,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.whatsappPermissions
+   */
+  export type User$whatsappPermissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    where?: WaNumberPermissionWhereInput
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    cursor?: WaNumberPermissionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: WaNumberPermissionScalarFieldEnum | WaNumberPermissionScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2266,6 +2458,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -2469,6 +2665,7 @@ export namespace Prisma {
     createdAt?: boolean
     sessions?: boolean | WhatsAppNumber$sessionsArgs<ExtArgs>
     chats?: boolean | WhatsAppNumber$chatsArgs<ExtArgs>
+    permissions?: boolean | WhatsAppNumber$permissionsArgs<ExtArgs>
     _count?: boolean | WhatsAppNumberCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["whatsAppNumber"]>
 
@@ -2486,6 +2683,7 @@ export namespace Prisma {
   export type WhatsAppNumberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | WhatsAppNumber$sessionsArgs<ExtArgs>
     chats?: boolean | WhatsAppNumber$chatsArgs<ExtArgs>
+    permissions?: boolean | WhatsAppNumber$permissionsArgs<ExtArgs>
     _count?: boolean | WhatsAppNumberCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -2494,6 +2692,7 @@ export namespace Prisma {
     objects: {
       sessions: Prisma.$WhatsAppSessionPayload<ExtArgs>[]
       chats: Prisma.$ChatPayload<ExtArgs>[]
+      permissions: Prisma.$WaNumberPermissionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -2843,6 +3042,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     sessions<T extends WhatsAppNumber$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppNumber$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WhatsAppSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     chats<T extends WhatsAppNumber$chatsArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppNumber$chatsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    permissions<T extends WhatsAppNumber$permissionsArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppNumber$permissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3265,6 +3465,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ChatScalarFieldEnum | ChatScalarFieldEnum[]
+  }
+
+  /**
+   * WhatsAppNumber.permissions
+   */
+  export type WhatsAppNumber$permissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    where?: WaNumberPermissionWhereInput
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    cursor?: WaNumberPermissionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: WaNumberPermissionScalarFieldEnum | WaNumberPermissionScalarFieldEnum[]
   }
 
   /**
@@ -6554,6 +6778,981 @@ export namespace Prisma {
 
 
   /**
+   * Model WaNumberPermission
+   */
+
+  export type AggregateWaNumberPermission = {
+    _count: WaNumberPermissionCountAggregateOutputType | null
+    _avg: WaNumberPermissionAvgAggregateOutputType | null
+    _sum: WaNumberPermissionSumAggregateOutputType | null
+    _min: WaNumberPermissionMinAggregateOutputType | null
+    _max: WaNumberPermissionMaxAggregateOutputType | null
+  }
+
+  export type WaNumberPermissionAvgAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    whatsappNumberId: number | null
+  }
+
+  export type WaNumberPermissionSumAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    whatsappNumberId: number | null
+  }
+
+  export type WaNumberPermissionMinAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    whatsappNumberId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WaNumberPermissionMaxAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    whatsappNumberId: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WaNumberPermissionCountAggregateOutputType = {
+    id: number
+    userId: number
+    whatsappNumberId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type WaNumberPermissionAvgAggregateInputType = {
+    id?: true
+    userId?: true
+    whatsappNumberId?: true
+  }
+
+  export type WaNumberPermissionSumAggregateInputType = {
+    id?: true
+    userId?: true
+    whatsappNumberId?: true
+  }
+
+  export type WaNumberPermissionMinAggregateInputType = {
+    id?: true
+    userId?: true
+    whatsappNumberId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WaNumberPermissionMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    whatsappNumberId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WaNumberPermissionCountAggregateInputType = {
+    id?: true
+    userId?: true
+    whatsappNumberId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type WaNumberPermissionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WaNumberPermission to aggregate.
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WaNumberPermissions to fetch.
+     */
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WaNumberPermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WaNumberPermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WaNumberPermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WaNumberPermissions
+    **/
+    _count?: true | WaNumberPermissionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: WaNumberPermissionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: WaNumberPermissionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WaNumberPermissionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WaNumberPermissionMaxAggregateInputType
+  }
+
+  export type GetWaNumberPermissionAggregateType<T extends WaNumberPermissionAggregateArgs> = {
+        [P in keyof T & keyof AggregateWaNumberPermission]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWaNumberPermission[P]>
+      : GetScalarType<T[P], AggregateWaNumberPermission[P]>
+  }
+
+
+
+
+  export type WaNumberPermissionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WaNumberPermissionWhereInput
+    orderBy?: WaNumberPermissionOrderByWithAggregationInput | WaNumberPermissionOrderByWithAggregationInput[]
+    by: WaNumberPermissionScalarFieldEnum[] | WaNumberPermissionScalarFieldEnum
+    having?: WaNumberPermissionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WaNumberPermissionCountAggregateInputType | true
+    _avg?: WaNumberPermissionAvgAggregateInputType
+    _sum?: WaNumberPermissionSumAggregateInputType
+    _min?: WaNumberPermissionMinAggregateInputType
+    _max?: WaNumberPermissionMaxAggregateInputType
+  }
+
+  export type WaNumberPermissionGroupByOutputType = {
+    id: number
+    userId: number
+    whatsappNumberId: number
+    createdAt: Date
+    updatedAt: Date
+    _count: WaNumberPermissionCountAggregateOutputType | null
+    _avg: WaNumberPermissionAvgAggregateOutputType | null
+    _sum: WaNumberPermissionSumAggregateOutputType | null
+    _min: WaNumberPermissionMinAggregateOutputType | null
+    _max: WaNumberPermissionMaxAggregateOutputType | null
+  }
+
+  type GetWaNumberPermissionGroupByPayload<T extends WaNumberPermissionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WaNumberPermissionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WaNumberPermissionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WaNumberPermissionGroupByOutputType[P]>
+            : GetScalarType<T[P], WaNumberPermissionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WaNumberPermissionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    whatsappNumberId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    whatsappNumber?: boolean | WhatsAppNumberDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["waNumberPermission"]>
+
+
+
+  export type WaNumberPermissionSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    whatsappNumberId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type WaNumberPermissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "whatsappNumberId" | "createdAt" | "updatedAt", ExtArgs["result"]["waNumberPermission"]>
+  export type WaNumberPermissionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    whatsappNumber?: boolean | WhatsAppNumberDefaultArgs<ExtArgs>
+  }
+
+  export type $WaNumberPermissionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WaNumberPermission"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      whatsappNumber: Prisma.$WhatsAppNumberPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      userId: number
+      whatsappNumberId: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["waNumberPermission"]>
+    composites: {}
+  }
+
+  type WaNumberPermissionGetPayload<S extends boolean | null | undefined | WaNumberPermissionDefaultArgs> = $Result.GetResult<Prisma.$WaNumberPermissionPayload, S>
+
+  type WaNumberPermissionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WaNumberPermissionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WaNumberPermissionCountAggregateInputType | true
+    }
+
+  export interface WaNumberPermissionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WaNumberPermission'], meta: { name: 'WaNumberPermission' } }
+    /**
+     * Find zero or one WaNumberPermission that matches the filter.
+     * @param {WaNumberPermissionFindUniqueArgs} args - Arguments to find a WaNumberPermission
+     * @example
+     * // Get one WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WaNumberPermissionFindUniqueArgs>(args: SelectSubset<T, WaNumberPermissionFindUniqueArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WaNumberPermission that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WaNumberPermissionFindUniqueOrThrowArgs} args - Arguments to find a WaNumberPermission
+     * @example
+     * // Get one WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WaNumberPermissionFindUniqueOrThrowArgs>(args: SelectSubset<T, WaNumberPermissionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WaNumberPermission that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionFindFirstArgs} args - Arguments to find a WaNumberPermission
+     * @example
+     * // Get one WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WaNumberPermissionFindFirstArgs>(args?: SelectSubset<T, WaNumberPermissionFindFirstArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WaNumberPermission that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionFindFirstOrThrowArgs} args - Arguments to find a WaNumberPermission
+     * @example
+     * // Get one WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WaNumberPermissionFindFirstOrThrowArgs>(args?: SelectSubset<T, WaNumberPermissionFindFirstOrThrowArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WaNumberPermissions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WaNumberPermissions
+     * const waNumberPermissions = await prisma.waNumberPermission.findMany()
+     * 
+     * // Get first 10 WaNumberPermissions
+     * const waNumberPermissions = await prisma.waNumberPermission.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const waNumberPermissionWithIdOnly = await prisma.waNumberPermission.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WaNumberPermissionFindManyArgs>(args?: SelectSubset<T, WaNumberPermissionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WaNumberPermission.
+     * @param {WaNumberPermissionCreateArgs} args - Arguments to create a WaNumberPermission.
+     * @example
+     * // Create one WaNumberPermission
+     * const WaNumberPermission = await prisma.waNumberPermission.create({
+     *   data: {
+     *     // ... data to create a WaNumberPermission
+     *   }
+     * })
+     * 
+     */
+    create<T extends WaNumberPermissionCreateArgs>(args: SelectSubset<T, WaNumberPermissionCreateArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WaNumberPermissions.
+     * @param {WaNumberPermissionCreateManyArgs} args - Arguments to create many WaNumberPermissions.
+     * @example
+     * // Create many WaNumberPermissions
+     * const waNumberPermission = await prisma.waNumberPermission.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WaNumberPermissionCreateManyArgs>(args?: SelectSubset<T, WaNumberPermissionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a WaNumberPermission.
+     * @param {WaNumberPermissionDeleteArgs} args - Arguments to delete one WaNumberPermission.
+     * @example
+     * // Delete one WaNumberPermission
+     * const WaNumberPermission = await prisma.waNumberPermission.delete({
+     *   where: {
+     *     // ... filter to delete one WaNumberPermission
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WaNumberPermissionDeleteArgs>(args: SelectSubset<T, WaNumberPermissionDeleteArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WaNumberPermission.
+     * @param {WaNumberPermissionUpdateArgs} args - Arguments to update one WaNumberPermission.
+     * @example
+     * // Update one WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WaNumberPermissionUpdateArgs>(args: SelectSubset<T, WaNumberPermissionUpdateArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WaNumberPermissions.
+     * @param {WaNumberPermissionDeleteManyArgs} args - Arguments to filter WaNumberPermissions to delete.
+     * @example
+     * // Delete a few WaNumberPermissions
+     * const { count } = await prisma.waNumberPermission.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WaNumberPermissionDeleteManyArgs>(args?: SelectSubset<T, WaNumberPermissionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WaNumberPermissions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WaNumberPermissions
+     * const waNumberPermission = await prisma.waNumberPermission.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WaNumberPermissionUpdateManyArgs>(args: SelectSubset<T, WaNumberPermissionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one WaNumberPermission.
+     * @param {WaNumberPermissionUpsertArgs} args - Arguments to update or create a WaNumberPermission.
+     * @example
+     * // Update or create a WaNumberPermission
+     * const waNumberPermission = await prisma.waNumberPermission.upsert({
+     *   create: {
+     *     // ... data to create a WaNumberPermission
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WaNumberPermission we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WaNumberPermissionUpsertArgs>(args: SelectSubset<T, WaNumberPermissionUpsertArgs<ExtArgs>>): Prisma__WaNumberPermissionClient<$Result.GetResult<Prisma.$WaNumberPermissionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WaNumberPermissions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionCountArgs} args - Arguments to filter WaNumberPermissions to count.
+     * @example
+     * // Count the number of WaNumberPermissions
+     * const count = await prisma.waNumberPermission.count({
+     *   where: {
+     *     // ... the filter for the WaNumberPermissions we want to count
+     *   }
+     * })
+    **/
+    count<T extends WaNumberPermissionCountArgs>(
+      args?: Subset<T, WaNumberPermissionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WaNumberPermissionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WaNumberPermission.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WaNumberPermissionAggregateArgs>(args: Subset<T, WaNumberPermissionAggregateArgs>): Prisma.PrismaPromise<GetWaNumberPermissionAggregateType<T>>
+
+    /**
+     * Group by WaNumberPermission.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WaNumberPermissionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WaNumberPermissionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WaNumberPermissionGroupByArgs['orderBy'] }
+        : { orderBy?: WaNumberPermissionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WaNumberPermissionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWaNumberPermissionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WaNumberPermission model
+   */
+  readonly fields: WaNumberPermissionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WaNumberPermission.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WaNumberPermissionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    whatsappNumber<T extends WhatsAppNumberDefaultArgs<ExtArgs> = {}>(args?: Subset<T, WhatsAppNumberDefaultArgs<ExtArgs>>): Prisma__WhatsAppNumberClient<$Result.GetResult<Prisma.$WhatsAppNumberPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WaNumberPermission model
+   */
+  interface WaNumberPermissionFieldRefs {
+    readonly id: FieldRef<"WaNumberPermission", 'Int'>
+    readonly userId: FieldRef<"WaNumberPermission", 'Int'>
+    readonly whatsappNumberId: FieldRef<"WaNumberPermission", 'Int'>
+    readonly createdAt: FieldRef<"WaNumberPermission", 'DateTime'>
+    readonly updatedAt: FieldRef<"WaNumberPermission", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WaNumberPermission findUnique
+   */
+  export type WaNumberPermissionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which WaNumberPermission to fetch.
+     */
+    where: WaNumberPermissionWhereUniqueInput
+  }
+
+  /**
+   * WaNumberPermission findUniqueOrThrow
+   */
+  export type WaNumberPermissionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which WaNumberPermission to fetch.
+     */
+    where: WaNumberPermissionWhereUniqueInput
+  }
+
+  /**
+   * WaNumberPermission findFirst
+   */
+  export type WaNumberPermissionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which WaNumberPermission to fetch.
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WaNumberPermissions to fetch.
+     */
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WaNumberPermissions.
+     */
+    cursor?: WaNumberPermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WaNumberPermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WaNumberPermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WaNumberPermissions.
+     */
+    distinct?: WaNumberPermissionScalarFieldEnum | WaNumberPermissionScalarFieldEnum[]
+  }
+
+  /**
+   * WaNumberPermission findFirstOrThrow
+   */
+  export type WaNumberPermissionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which WaNumberPermission to fetch.
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WaNumberPermissions to fetch.
+     */
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WaNumberPermissions.
+     */
+    cursor?: WaNumberPermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WaNumberPermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WaNumberPermissions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WaNumberPermissions.
+     */
+    distinct?: WaNumberPermissionScalarFieldEnum | WaNumberPermissionScalarFieldEnum[]
+  }
+
+  /**
+   * WaNumberPermission findMany
+   */
+  export type WaNumberPermissionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter, which WaNumberPermissions to fetch.
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WaNumberPermissions to fetch.
+     */
+    orderBy?: WaNumberPermissionOrderByWithRelationInput | WaNumberPermissionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WaNumberPermissions.
+     */
+    cursor?: WaNumberPermissionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WaNumberPermissions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WaNumberPermissions.
+     */
+    skip?: number
+    distinct?: WaNumberPermissionScalarFieldEnum | WaNumberPermissionScalarFieldEnum[]
+  }
+
+  /**
+   * WaNumberPermission create
+   */
+  export type WaNumberPermissionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a WaNumberPermission.
+     */
+    data: XOR<WaNumberPermissionCreateInput, WaNumberPermissionUncheckedCreateInput>
+  }
+
+  /**
+   * WaNumberPermission createMany
+   */
+  export type WaNumberPermissionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WaNumberPermissions.
+     */
+    data: WaNumberPermissionCreateManyInput | WaNumberPermissionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WaNumberPermission update
+   */
+  export type WaNumberPermissionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a WaNumberPermission.
+     */
+    data: XOR<WaNumberPermissionUpdateInput, WaNumberPermissionUncheckedUpdateInput>
+    /**
+     * Choose, which WaNumberPermission to update.
+     */
+    where: WaNumberPermissionWhereUniqueInput
+  }
+
+  /**
+   * WaNumberPermission updateMany
+   */
+  export type WaNumberPermissionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WaNumberPermissions.
+     */
+    data: XOR<WaNumberPermissionUpdateManyMutationInput, WaNumberPermissionUncheckedUpdateManyInput>
+    /**
+     * Filter which WaNumberPermissions to update
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * Limit how many WaNumberPermissions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WaNumberPermission upsert
+   */
+  export type WaNumberPermissionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the WaNumberPermission to update in case it exists.
+     */
+    where: WaNumberPermissionWhereUniqueInput
+    /**
+     * In case the WaNumberPermission found by the `where` argument doesn't exist, create a new WaNumberPermission with this data.
+     */
+    create: XOR<WaNumberPermissionCreateInput, WaNumberPermissionUncheckedCreateInput>
+    /**
+     * In case the WaNumberPermission was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WaNumberPermissionUpdateInput, WaNumberPermissionUncheckedUpdateInput>
+  }
+
+  /**
+   * WaNumberPermission delete
+   */
+  export type WaNumberPermissionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+    /**
+     * Filter which WaNumberPermission to delete.
+     */
+    where: WaNumberPermissionWhereUniqueInput
+  }
+
+  /**
+   * WaNumberPermission deleteMany
+   */
+  export type WaNumberPermissionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WaNumberPermissions to delete
+     */
+    where?: WaNumberPermissionWhereInput
+    /**
+     * Limit how many WaNumberPermissions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WaNumberPermission without action
+   */
+  export type WaNumberPermissionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WaNumberPermission
+     */
+    select?: WaNumberPermissionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WaNumberPermission
+     */
+    omit?: WaNumberPermissionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WaNumberPermissionInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -6655,6 +7854,17 @@ export namespace Prisma {
   };
 
   export type MessageScalarFieldEnum = (typeof MessageScalarFieldEnum)[keyof typeof MessageScalarFieldEnum]
+
+
+  export const WaNumberPermissionScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    whatsappNumberId: 'whatsappNumberId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type WaNumberPermissionScalarFieldEnum = (typeof WaNumberPermissionScalarFieldEnum)[keyof typeof WaNumberPermissionScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -6855,6 +8065,7 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    whatsappPermissions?: WaNumberPermissionListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -6866,6 +8077,7 @@ export namespace Prisma {
     password?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    whatsappPermissions?: WaNumberPermissionOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -6881,6 +8093,7 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    whatsappPermissions?: WaNumberPermissionListRelationFilter
   }, "id" | "username" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -6924,6 +8137,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"WhatsAppNumber"> | Date | string
     sessions?: WhatsAppSessionListRelationFilter
     chats?: ChatListRelationFilter
+    permissions?: WaNumberPermissionListRelationFilter
   }
 
   export type WhatsAppNumberOrderByWithRelationInput = {
@@ -6934,6 +8148,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     sessions?: WhatsAppSessionOrderByRelationAggregateInput
     chats?: ChatOrderByRelationAggregateInput
+    permissions?: WaNumberPermissionOrderByRelationAggregateInput
     _relevance?: WhatsAppNumberOrderByRelevanceInput
   }
 
@@ -6948,6 +8163,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"WhatsAppNumber"> | Date | string
     sessions?: WhatsAppSessionListRelationFilter
     chats?: ChatListRelationFilter
+    permissions?: WaNumberPermissionListRelationFilter
   }, "id" | "phoneNumber">
 
   export type WhatsAppNumberOrderByWithAggregationInput = {
@@ -7313,6 +8529,67 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Message"> | Date | string
   }
 
+  export type WaNumberPermissionWhereInput = {
+    AND?: WaNumberPermissionWhereInput | WaNumberPermissionWhereInput[]
+    OR?: WaNumberPermissionWhereInput[]
+    NOT?: WaNumberPermissionWhereInput | WaNumberPermissionWhereInput[]
+    id?: IntFilter<"WaNumberPermission"> | number
+    userId?: IntFilter<"WaNumberPermission"> | number
+    whatsappNumberId?: IntFilter<"WaNumberPermission"> | number
+    createdAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+    updatedAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    whatsappNumber?: XOR<WhatsAppNumberScalarRelationFilter, WhatsAppNumberWhereInput>
+  }
+
+  export type WaNumberPermissionOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    whatsappNumber?: WhatsAppNumberOrderByWithRelationInput
+  }
+
+  export type WaNumberPermissionWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    userId_whatsappNumberId?: WaNumberPermissionUserIdWhatsappNumberIdCompoundUniqueInput
+    AND?: WaNumberPermissionWhereInput | WaNumberPermissionWhereInput[]
+    OR?: WaNumberPermissionWhereInput[]
+    NOT?: WaNumberPermissionWhereInput | WaNumberPermissionWhereInput[]
+    userId?: IntFilter<"WaNumberPermission"> | number
+    whatsappNumberId?: IntFilter<"WaNumberPermission"> | number
+    createdAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+    updatedAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    whatsappNumber?: XOR<WhatsAppNumberScalarRelationFilter, WhatsAppNumberWhereInput>
+  }, "id" | "userId_whatsappNumberId">
+
+  export type WaNumberPermissionOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: WaNumberPermissionCountOrderByAggregateInput
+    _avg?: WaNumberPermissionAvgOrderByAggregateInput
+    _max?: WaNumberPermissionMaxOrderByAggregateInput
+    _min?: WaNumberPermissionMinOrderByAggregateInput
+    _sum?: WaNumberPermissionSumOrderByAggregateInput
+  }
+
+  export type WaNumberPermissionScalarWhereWithAggregatesInput = {
+    AND?: WaNumberPermissionScalarWhereWithAggregatesInput | WaNumberPermissionScalarWhereWithAggregatesInput[]
+    OR?: WaNumberPermissionScalarWhereWithAggregatesInput[]
+    NOT?: WaNumberPermissionScalarWhereWithAggregatesInput | WaNumberPermissionScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"WaNumberPermission"> | number
+    userId?: IntWithAggregatesFilter<"WaNumberPermission"> | number
+    whatsappNumberId?: IntWithAggregatesFilter<"WaNumberPermission"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"WaNumberPermission"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"WaNumberPermission"> | Date | string
+  }
+
   export type UserCreateInput = {
     name: string
     username: string
@@ -7321,6 +8598,7 @@ export namespace Prisma {
     password: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    whatsappPermissions?: WaNumberPermissionCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -7332,6 +8610,7 @@ export namespace Prisma {
     password: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    whatsappPermissions?: WaNumberPermissionUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -7342,6 +8621,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    whatsappPermissions?: WaNumberPermissionUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -7353,6 +8633,7 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    whatsappPermissions?: WaNumberPermissionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -7394,6 +8675,7 @@ export namespace Prisma {
     createdAt?: Date | string
     sessions?: WhatsAppSessionCreateNestedManyWithoutWhatsappNumberInput
     chats?: ChatCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberUncheckedCreateInput = {
@@ -7404,6 +8686,7 @@ export namespace Prisma {
     createdAt?: Date | string
     sessions?: WhatsAppSessionUncheckedCreateNestedManyWithoutWhatsappNumberInput
     chats?: ChatUncheckedCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionUncheckedCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberUpdateInput = {
@@ -7413,6 +8696,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: WhatsAppSessionUpdateManyWithoutWhatsappNumberNestedInput
     chats?: ChatUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type WhatsAppNumberUncheckedUpdateInput = {
@@ -7423,6 +8707,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: WhatsAppSessionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
     chats?: ChatUncheckedUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type WhatsAppNumberCreateManyInput = {
@@ -7841,6 +9126,57 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type WaNumberPermissionCreateInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutWhatsappPermissionsInput
+    whatsappNumber: WhatsAppNumberCreateNestedOneWithoutPermissionsInput
+  }
+
+  export type WaNumberPermissionUncheckedCreateInput = {
+    id?: number
+    userId: number
+    whatsappNumberId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionUpdateInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutWhatsappPermissionsNestedInput
+    whatsappNumber?: WhatsAppNumberUpdateOneRequiredWithoutPermissionsNestedInput
+  }
+
+  export type WaNumberPermissionUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    whatsappNumberId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WaNumberPermissionCreateManyInput = {
+    id?: number
+    userId: number
+    whatsappNumberId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionUpdateManyMutationInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WaNumberPermissionUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    whatsappNumberId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -7883,6 +9219,16 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type WaNumberPermissionListRelationFilter = {
+    every?: WaNumberPermissionWhereInput
+    some?: WaNumberPermissionWhereInput
+    none?: WaNumberPermissionWhereInput
+  }
+
+  export type WaNumberPermissionOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type UserOrderByRelevanceInput = {
@@ -8489,6 +9835,66 @@ export namespace Prisma {
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
   }
 
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type WaNumberPermissionUserIdWhatsappNumberIdCompoundUniqueInput = {
+    userId: number
+    whatsappNumberId: number
+  }
+
+  export type WaNumberPermissionCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WaNumberPermissionAvgOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+  }
+
+  export type WaNumberPermissionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WaNumberPermissionMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WaNumberPermissionSumOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    whatsappNumberId?: SortOrder
+  }
+
+  export type WaNumberPermissionCreateNestedManyWithoutUserInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput> | WaNumberPermissionCreateWithoutUserInput[] | WaNumberPermissionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutUserInput | WaNumberPermissionCreateOrConnectWithoutUserInput[]
+    createMany?: WaNumberPermissionCreateManyUserInputEnvelope
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+  }
+
+  export type WaNumberPermissionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput> | WaNumberPermissionCreateWithoutUserInput[] | WaNumberPermissionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutUserInput | WaNumberPermissionCreateOrConnectWithoutUserInput[]
+    createMany?: WaNumberPermissionCreateManyUserInputEnvelope
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -8501,12 +9907,40 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type WaNumberPermissionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput> | WaNumberPermissionCreateWithoutUserInput[] | WaNumberPermissionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutUserInput | WaNumberPermissionCreateOrConnectWithoutUserInput[]
+    upsert?: WaNumberPermissionUpsertWithWhereUniqueWithoutUserInput | WaNumberPermissionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WaNumberPermissionCreateManyUserInputEnvelope
+    set?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    disconnect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    delete?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    update?: WaNumberPermissionUpdateWithWhereUniqueWithoutUserInput | WaNumberPermissionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WaNumberPermissionUpdateManyWithWhereWithoutUserInput | WaNumberPermissionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type WaNumberPermissionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput> | WaNumberPermissionCreateWithoutUserInput[] | WaNumberPermissionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutUserInput | WaNumberPermissionCreateOrConnectWithoutUserInput[]
+    upsert?: WaNumberPermissionUpsertWithWhereUniqueWithoutUserInput | WaNumberPermissionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WaNumberPermissionCreateManyUserInputEnvelope
+    set?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    disconnect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    delete?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    update?: WaNumberPermissionUpdateWithWhereUniqueWithoutUserInput | WaNumberPermissionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WaNumberPermissionUpdateManyWithWhereWithoutUserInput | WaNumberPermissionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
   }
 
   export type WhatsAppSessionCreateNestedManyWithoutWhatsappNumberInput = {
@@ -8523,6 +9957,13 @@ export namespace Prisma {
     connect?: ChatWhereUniqueInput | ChatWhereUniqueInput[]
   }
 
+  export type WaNumberPermissionCreateNestedManyWithoutWhatsappNumberInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput> | WaNumberPermissionCreateWithoutWhatsappNumberInput[] | WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput | WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput[]
+    createMany?: WaNumberPermissionCreateManyWhatsappNumberInputEnvelope
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+  }
+
   export type WhatsAppSessionUncheckedCreateNestedManyWithoutWhatsappNumberInput = {
     create?: XOR<WhatsAppSessionCreateWithoutWhatsappNumberInput, WhatsAppSessionUncheckedCreateWithoutWhatsappNumberInput> | WhatsAppSessionCreateWithoutWhatsappNumberInput[] | WhatsAppSessionUncheckedCreateWithoutWhatsappNumberInput[]
     connectOrCreate?: WhatsAppSessionCreateOrConnectWithoutWhatsappNumberInput | WhatsAppSessionCreateOrConnectWithoutWhatsappNumberInput[]
@@ -8535,6 +9976,13 @@ export namespace Prisma {
     connectOrCreate?: ChatCreateOrConnectWithoutWhatsappNumberInput | ChatCreateOrConnectWithoutWhatsappNumberInput[]
     createMany?: ChatCreateManyWhatsappNumberInputEnvelope
     connect?: ChatWhereUniqueInput | ChatWhereUniqueInput[]
+  }
+
+  export type WaNumberPermissionUncheckedCreateNestedManyWithoutWhatsappNumberInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput> | WaNumberPermissionCreateWithoutWhatsappNumberInput[] | WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput | WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput[]
+    createMany?: WaNumberPermissionCreateManyWhatsappNumberInputEnvelope
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -8569,6 +10017,20 @@ export namespace Prisma {
     deleteMany?: ChatScalarWhereInput | ChatScalarWhereInput[]
   }
 
+  export type WaNumberPermissionUpdateManyWithoutWhatsappNumberNestedInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput> | WaNumberPermissionCreateWithoutWhatsappNumberInput[] | WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput | WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput[]
+    upsert?: WaNumberPermissionUpsertWithWhereUniqueWithoutWhatsappNumberInput | WaNumberPermissionUpsertWithWhereUniqueWithoutWhatsappNumberInput[]
+    createMany?: WaNumberPermissionCreateManyWhatsappNumberInputEnvelope
+    set?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    disconnect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    delete?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    update?: WaNumberPermissionUpdateWithWhereUniqueWithoutWhatsappNumberInput | WaNumberPermissionUpdateWithWhereUniqueWithoutWhatsappNumberInput[]
+    updateMany?: WaNumberPermissionUpdateManyWithWhereWithoutWhatsappNumberInput | WaNumberPermissionUpdateManyWithWhereWithoutWhatsappNumberInput[]
+    deleteMany?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
+  }
+
   export type WhatsAppSessionUncheckedUpdateManyWithoutWhatsappNumberNestedInput = {
     create?: XOR<WhatsAppSessionCreateWithoutWhatsappNumberInput, WhatsAppSessionUncheckedCreateWithoutWhatsappNumberInput> | WhatsAppSessionCreateWithoutWhatsappNumberInput[] | WhatsAppSessionUncheckedCreateWithoutWhatsappNumberInput[]
     connectOrCreate?: WhatsAppSessionCreateOrConnectWithoutWhatsappNumberInput | WhatsAppSessionCreateOrConnectWithoutWhatsappNumberInput[]
@@ -8595,6 +10057,20 @@ export namespace Prisma {
     update?: ChatUpdateWithWhereUniqueWithoutWhatsappNumberInput | ChatUpdateWithWhereUniqueWithoutWhatsappNumberInput[]
     updateMany?: ChatUpdateManyWithWhereWithoutWhatsappNumberInput | ChatUpdateManyWithWhereWithoutWhatsappNumberInput[]
     deleteMany?: ChatScalarWhereInput | ChatScalarWhereInput[]
+  }
+
+  export type WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberNestedInput = {
+    create?: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput> | WaNumberPermissionCreateWithoutWhatsappNumberInput[] | WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput[]
+    connectOrCreate?: WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput | WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput[]
+    upsert?: WaNumberPermissionUpsertWithWhereUniqueWithoutWhatsappNumberInput | WaNumberPermissionUpsertWithWhereUniqueWithoutWhatsappNumberInput[]
+    createMany?: WaNumberPermissionCreateManyWhatsappNumberInputEnvelope
+    set?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    disconnect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    delete?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    connect?: WaNumberPermissionWhereUniqueInput | WaNumberPermissionWhereUniqueInput[]
+    update?: WaNumberPermissionUpdateWithWhereUniqueWithoutWhatsappNumberInput | WaNumberPermissionUpdateWithWhereUniqueWithoutWhatsappNumberInput[]
+    updateMany?: WaNumberPermissionUpdateManyWithWhereWithoutWhatsappNumberInput | WaNumberPermissionUpdateManyWithWhereWithoutWhatsappNumberInput[]
+    deleteMany?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
   }
 
   export type WhatsAppNumberCreateNestedOneWithoutSessionsInput = {
@@ -8707,6 +10183,34 @@ export namespace Prisma {
     upsert?: ChatUpsertWithoutMessagesInput
     connect?: ChatWhereUniqueInput
     update?: XOR<XOR<ChatUpdateToOneWithWhereWithoutMessagesInput, ChatUpdateWithoutMessagesInput>, ChatUncheckedUpdateWithoutMessagesInput>
+  }
+
+  export type UserCreateNestedOneWithoutWhatsappPermissionsInput = {
+    create?: XOR<UserCreateWithoutWhatsappPermissionsInput, UserUncheckedCreateWithoutWhatsappPermissionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWhatsappPermissionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type WhatsAppNumberCreateNestedOneWithoutPermissionsInput = {
+    create?: XOR<WhatsAppNumberCreateWithoutPermissionsInput, WhatsAppNumberUncheckedCreateWithoutPermissionsInput>
+    connectOrCreate?: WhatsAppNumberCreateOrConnectWithoutPermissionsInput
+    connect?: WhatsAppNumberWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutWhatsappPermissionsNestedInput = {
+    create?: XOR<UserCreateWithoutWhatsappPermissionsInput, UserUncheckedCreateWithoutWhatsappPermissionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWhatsappPermissionsInput
+    upsert?: UserUpsertWithoutWhatsappPermissionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWhatsappPermissionsInput, UserUpdateWithoutWhatsappPermissionsInput>, UserUncheckedUpdateWithoutWhatsappPermissionsInput>
+  }
+
+  export type WhatsAppNumberUpdateOneRequiredWithoutPermissionsNestedInput = {
+    create?: XOR<WhatsAppNumberCreateWithoutPermissionsInput, WhatsAppNumberUncheckedCreateWithoutPermissionsInput>
+    connectOrCreate?: WhatsAppNumberCreateOrConnectWithoutPermissionsInput
+    upsert?: WhatsAppNumberUpsertWithoutPermissionsInput
+    connect?: WhatsAppNumberWhereUniqueInput
+    update?: XOR<XOR<WhatsAppNumberUpdateToOneWithWhereWithoutPermissionsInput, WhatsAppNumberUpdateWithoutPermissionsInput>, WhatsAppNumberUncheckedUpdateWithoutPermissionsInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -9005,6 +10509,56 @@ export namespace Prisma {
     _max?: NestedEnumMessageStatusFilter<$PrismaModel>
   }
 
+  export type WaNumberPermissionCreateWithoutUserInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    whatsappNumber: WhatsAppNumberCreateNestedOneWithoutPermissionsInput
+  }
+
+  export type WaNumberPermissionUncheckedCreateWithoutUserInput = {
+    id?: number
+    whatsappNumberId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionCreateOrConnectWithoutUserInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    create: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput>
+  }
+
+  export type WaNumberPermissionCreateManyUserInputEnvelope = {
+    data: WaNumberPermissionCreateManyUserInput | WaNumberPermissionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type WaNumberPermissionUpsertWithWhereUniqueWithoutUserInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    update: XOR<WaNumberPermissionUpdateWithoutUserInput, WaNumberPermissionUncheckedUpdateWithoutUserInput>
+    create: XOR<WaNumberPermissionCreateWithoutUserInput, WaNumberPermissionUncheckedCreateWithoutUserInput>
+  }
+
+  export type WaNumberPermissionUpdateWithWhereUniqueWithoutUserInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    data: XOR<WaNumberPermissionUpdateWithoutUserInput, WaNumberPermissionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type WaNumberPermissionUpdateManyWithWhereWithoutUserInput = {
+    where: WaNumberPermissionScalarWhereInput
+    data: XOR<WaNumberPermissionUpdateManyMutationInput, WaNumberPermissionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type WaNumberPermissionScalarWhereInput = {
+    AND?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
+    OR?: WaNumberPermissionScalarWhereInput[]
+    NOT?: WaNumberPermissionScalarWhereInput | WaNumberPermissionScalarWhereInput[]
+    id?: IntFilter<"WaNumberPermission"> | number
+    userId?: IntFilter<"WaNumberPermission"> | number
+    whatsappNumberId?: IntFilter<"WaNumberPermission"> | number
+    createdAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+    updatedAt?: DateTimeFilter<"WaNumberPermission"> | Date | string
+  }
+
   export type WhatsAppSessionCreateWithoutWhatsappNumberInput = {
     id?: string
     sessionData?: NullableJsonNullValueInput | InputJsonValue
@@ -9087,6 +10641,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type WaNumberPermissionCreateWithoutWhatsappNumberInput = {
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutWhatsappPermissionsInput
+  }
+
+  export type WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput = {
+    id?: number
+    userId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionCreateOrConnectWithoutWhatsappNumberInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    create: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput>
+  }
+
+  export type WaNumberPermissionCreateManyWhatsappNumberInputEnvelope = {
+    data: WaNumberPermissionCreateManyWhatsappNumberInput | WaNumberPermissionCreateManyWhatsappNumberInput[]
+    skipDuplicates?: boolean
+  }
+
   export type WhatsAppSessionUpsertWithWhereUniqueWithoutWhatsappNumberInput = {
     where: WhatsAppSessionWhereUniqueInput
     update: XOR<WhatsAppSessionUpdateWithoutWhatsappNumberInput, WhatsAppSessionUncheckedUpdateWithoutWhatsappNumberInput>
@@ -9157,12 +10734,29 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Chat"> | Date | string
   }
 
+  export type WaNumberPermissionUpsertWithWhereUniqueWithoutWhatsappNumberInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    update: XOR<WaNumberPermissionUpdateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedUpdateWithoutWhatsappNumberInput>
+    create: XOR<WaNumberPermissionCreateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedCreateWithoutWhatsappNumberInput>
+  }
+
+  export type WaNumberPermissionUpdateWithWhereUniqueWithoutWhatsappNumberInput = {
+    where: WaNumberPermissionWhereUniqueInput
+    data: XOR<WaNumberPermissionUpdateWithoutWhatsappNumberInput, WaNumberPermissionUncheckedUpdateWithoutWhatsappNumberInput>
+  }
+
+  export type WaNumberPermissionUpdateManyWithWhereWithoutWhatsappNumberInput = {
+    where: WaNumberPermissionScalarWhereInput
+    data: XOR<WaNumberPermissionUpdateManyMutationInput, WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberInput>
+  }
+
   export type WhatsAppNumberCreateWithoutSessionsInput = {
     name: string
     phoneNumber: string
     isActive?: boolean
     createdAt?: Date | string
     chats?: ChatCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberUncheckedCreateWithoutSessionsInput = {
@@ -9172,6 +10766,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     chats?: ChatUncheckedCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionUncheckedCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberCreateOrConnectWithoutSessionsInput = {
@@ -9196,6 +10791,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chats?: ChatUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type WhatsAppNumberUncheckedUpdateWithoutSessionsInput = {
@@ -9205,6 +10801,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chats?: ChatUncheckedUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type WhatsAppNumberCreateWithoutChatsInput = {
@@ -9213,6 +10810,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     sessions?: WhatsAppSessionCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberUncheckedCreateWithoutChatsInput = {
@@ -9222,6 +10820,7 @@ export namespace Prisma {
     isActive?: boolean
     createdAt?: Date | string
     sessions?: WhatsAppSessionUncheckedCreateNestedManyWithoutWhatsappNumberInput
+    permissions?: WaNumberPermissionUncheckedCreateNestedManyWithoutWhatsappNumberInput
   }
 
   export type WhatsAppNumberCreateOrConnectWithoutChatsInput = {
@@ -9302,6 +10901,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: WhatsAppSessionUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type WhatsAppNumberUncheckedUpdateWithoutChatsInput = {
@@ -9311,6 +10911,7 @@ export namespace Prisma {
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: WhatsAppSessionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
+    permissions?: WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
   }
 
   export type MessageUpsertWithWhereUniqueWithoutChatInput = {
@@ -9444,6 +11045,145 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type UserCreateWithoutWhatsappPermissionsInput = {
+    name: string
+    username: string
+    email: string
+    role?: $Enums.UserRole
+    password: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserUncheckedCreateWithoutWhatsappPermissionsInput = {
+    id?: number
+    name: string
+    username: string
+    email: string
+    role?: $Enums.UserRole
+    password: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserCreateOrConnectWithoutWhatsappPermissionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWhatsappPermissionsInput, UserUncheckedCreateWithoutWhatsappPermissionsInput>
+  }
+
+  export type WhatsAppNumberCreateWithoutPermissionsInput = {
+    name: string
+    phoneNumber: string
+    isActive?: boolean
+    createdAt?: Date | string
+    sessions?: WhatsAppSessionCreateNestedManyWithoutWhatsappNumberInput
+    chats?: ChatCreateNestedManyWithoutWhatsappNumberInput
+  }
+
+  export type WhatsAppNumberUncheckedCreateWithoutPermissionsInput = {
+    id?: number
+    name: string
+    phoneNumber: string
+    isActive?: boolean
+    createdAt?: Date | string
+    sessions?: WhatsAppSessionUncheckedCreateNestedManyWithoutWhatsappNumberInput
+    chats?: ChatUncheckedCreateNestedManyWithoutWhatsappNumberInput
+  }
+
+  export type WhatsAppNumberCreateOrConnectWithoutPermissionsInput = {
+    where: WhatsAppNumberWhereUniqueInput
+    create: XOR<WhatsAppNumberCreateWithoutPermissionsInput, WhatsAppNumberUncheckedCreateWithoutPermissionsInput>
+  }
+
+  export type UserUpsertWithoutWhatsappPermissionsInput = {
+    update: XOR<UserUpdateWithoutWhatsappPermissionsInput, UserUncheckedUpdateWithoutWhatsappPermissionsInput>
+    create: XOR<UserCreateWithoutWhatsappPermissionsInput, UserUncheckedCreateWithoutWhatsappPermissionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutWhatsappPermissionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutWhatsappPermissionsInput, UserUncheckedUpdateWithoutWhatsappPermissionsInput>
+  }
+
+  export type UserUpdateWithoutWhatsappPermissionsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    password?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUncheckedUpdateWithoutWhatsappPermissionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    username?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    password?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WhatsAppNumberUpsertWithoutPermissionsInput = {
+    update: XOR<WhatsAppNumberUpdateWithoutPermissionsInput, WhatsAppNumberUncheckedUpdateWithoutPermissionsInput>
+    create: XOR<WhatsAppNumberCreateWithoutPermissionsInput, WhatsAppNumberUncheckedCreateWithoutPermissionsInput>
+    where?: WhatsAppNumberWhereInput
+  }
+
+  export type WhatsAppNumberUpdateToOneWithWhereWithoutPermissionsInput = {
+    where?: WhatsAppNumberWhereInput
+    data: XOR<WhatsAppNumberUpdateWithoutPermissionsInput, WhatsAppNumberUncheckedUpdateWithoutPermissionsInput>
+  }
+
+  export type WhatsAppNumberUpdateWithoutPermissionsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: WhatsAppSessionUpdateManyWithoutWhatsappNumberNestedInput
+    chats?: ChatUpdateManyWithoutWhatsappNumberNestedInput
+  }
+
+  export type WhatsAppNumberUncheckedUpdateWithoutPermissionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sessions?: WhatsAppSessionUncheckedUpdateManyWithoutWhatsappNumberNestedInput
+    chats?: ChatUncheckedUpdateManyWithoutWhatsappNumberNestedInput
+  }
+
+  export type WaNumberPermissionCreateManyUserInput = {
+    id?: number
+    whatsappNumberId: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionUpdateWithoutUserInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    whatsappNumber?: WhatsAppNumberUpdateOneRequiredWithoutPermissionsNestedInput
+  }
+
+  export type WaNumberPermissionUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    whatsappNumberId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WaNumberPermissionUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    whatsappNumberId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type WhatsAppSessionCreateManyWhatsappNumberInput = {
     id?: string
     sessionData?: NullableJsonNullValueInput | InputJsonValue
@@ -9470,6 +11210,13 @@ export namespace Prisma {
     unreadCount?: number
     isPinned?: boolean
     isArchived?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WaNumberPermissionCreateManyWhatsappNumberInput = {
+    id?: number
+    userId: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9562,6 +11309,26 @@ export namespace Prisma {
     unreadCount?: IntFieldUpdateOperationsInput | number
     isPinned?: BoolFieldUpdateOperationsInput | boolean
     isArchived?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WaNumberPermissionUpdateWithoutWhatsappNumberInput = {
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutWhatsappPermissionsNestedInput
+  }
+
+  export type WaNumberPermissionUncheckedUpdateWithoutWhatsappNumberInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WaNumberPermissionUncheckedUpdateManyWithoutWhatsappNumberInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

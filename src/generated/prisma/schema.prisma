@@ -29,6 +29,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relations
+  whatsappPermissions WaNumberPermission[]
+
   @@map("users")
 }
 
@@ -67,10 +70,12 @@ model WhatsAppNumber {
   isActive    Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  // Relation to sessions
-  sessions WhatsAppSession[]
+  // Relations
+  sessions    WhatsAppSession[]
   // Relation to chats where this number is the owner
-  chats    Chat[]
+  chats       Chat[]
+  // Relation to user permissions
+  permissions WaNumberPermission[]
 
   @@map("whatsapp_numbers")
 }
@@ -154,4 +159,21 @@ model Message {
   @@index([timestamp])
   @@index([fromJid])
   @@map("messages")
+}
+
+model WaNumberPermission {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  whatsappNumberId Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relations
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  whatsappNumber WhatsAppNumber @relation(fields: [whatsappNumberId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, whatsappNumberId]) // Prevent duplicate permissions
+  @@index([userId])
+  @@index([whatsappNumberId])
+  @@map("wa_number_permissions")
 }

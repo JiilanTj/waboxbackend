@@ -1,5 +1,28 @@
 import { Request, Response } from 'express';
 import { chatService, ChatPreview, MessageData } from '../services/chat/ChatService';
+import { PrismaClient } from '../generated/prisma';
+
+const prisma = new PrismaClient();
+
+/**
+ * Check if user has permission for WhatsApp number
+ */
+const checkWhatsAppPermission = async (userId: number, userRole: string, whatsappNumberId: number): Promise<boolean> => {
+  // Admin has access to all WhatsApp numbers
+  if (userRole === 'ADMIN') {
+    return true;
+  }
+
+  // Check specific permission for regular users
+  const permission = await prisma.waNumberPermission.findFirst({
+    where: {
+      userId: userId,
+      whatsappNumberId: whatsappNumberId
+    }
+  });
+
+  return !!permission;
+};
 
 /**
  * Get chat list for a WhatsApp number
@@ -9,6 +32,8 @@ export const getChatList = async (req: Request, res: Response): Promise<void> =>
   try {
     const { whatsappNumberId } = req.params;
     const { limit = '50', offset = '0' } = req.query;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
 
     const whatsappNumberIdInt = parseInt(whatsappNumberId);
     const limitInt = parseInt(limit as string);
@@ -18,6 +43,25 @@ export const getChatList = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({
         success: false,
         message: 'Invalid WhatsApp number ID'
+      });
+      return;
+    }
+
+    // Check permission
+    if (!userId || !userRole) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+      return;
+    }
+
+    const hasPermission = await checkWhatsAppPermission(userId, userRole, whatsappNumberIdInt);
+
+    if (!hasPermission) {
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this WhatsApp number'
       });
       return;
     }
@@ -52,9 +96,47 @@ export const getChatHistory = async (req: Request, res: Response): Promise<void>
   try {
     const { chatId } = req.params;
     const { limit = '50', offset = '0' } = req.query;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
 
     const limitInt = parseInt(limit as string);
     const offsetInt = parseInt(offset as string);
+
+    if (!userId || !userRole) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+      return;
+    }
+
+    // Get chat details to check permission
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      select: { 
+        id: true, 
+        whatsappNumberId: true 
+      }
+    });
+
+    if (!chat) {
+      res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+      return;
+    }
+
+    // Check permission for the WhatsApp number
+    const hasPermission = await checkWhatsAppPermission(userId, userRole, chat.whatsappNumberId);
+
+    if (!hasPermission) {
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this chat'
+      });
+      return;
+    }
 
     const messages = await chatService.getChatHistory(chatId, limitInt, offsetInt);
 
@@ -85,6 +167,44 @@ export const getChatHistory = async (req: Request, res: Response): Promise<void>
 export const markChatAsRead = async (req: Request, res: Response): Promise<void> => {
   try {
     const { chatId } = req.params;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    if (!userId || !userRole) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+      return;
+    }
+
+    // Get chat details to check permission
+    const chat = await prisma.chat.findUnique({
+      where: { id: chatId },
+      select: { 
+        id: true, 
+        whatsappNumberId: true 
+      }
+    });
+
+    if (!chat) {
+      res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+      return;
+    }
+
+    // Check permission for the WhatsApp number
+    const hasPermission = await checkWhatsAppPermission(userId, userRole, chat.whatsappNumberId);
+
+    if (!hasPermission) {
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this chat'
+      });
+      return;
+    }
 
     await chatService.markChatAsRead(chatId);
 
@@ -110,6 +230,8 @@ export const searchChats = async (req: Request, res: Response): Promise<void> =>
   try {
     const { whatsappNumberId } = req.params;
     const { q: query } = req.query;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
 
     const whatsappNumberIdInt = parseInt(whatsappNumberId);
 
@@ -125,6 +247,25 @@ export const searchChats = async (req: Request, res: Response): Promise<void> =>
       res.status(400).json({
         success: false,
         message: 'Search query is required'
+      });
+      return;
+    }
+
+    if (!userId || !userRole) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+      return;
+    }
+
+    // Check permission
+    const hasPermission = await checkWhatsAppPermission(userId, userRole, whatsappNumberIdInt);
+
+    if (!hasPermission) {
+      res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this WhatsApp number'
       });
       return;
     }

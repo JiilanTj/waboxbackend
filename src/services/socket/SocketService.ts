@@ -59,15 +59,31 @@ export class SocketService {
         return next(new Error('Invalid token: missing userId'));
       }
 
-      // Get user's WhatsApp numbers (filter by actual user ownership if needed)
-      const whatsappNumbers = await prisma.whatsAppNumber.findMany({
-        where: { 
-          isActive: true,
-          // TODO: Add user ownership filter if WhatsApp numbers belong to specific users
-          // userId: decoded.userId 
-        },
-        select: { id: true }
-      });
+      // Get user's permitted WhatsApp numbers based on role
+      let whatsappNumbers: { id: number }[];
+      
+      if (decoded.role === 'ADMIN') {
+        // Admin can access all active WhatsApp numbers
+        whatsappNumbers = await prisma.whatsAppNumber.findMany({
+          where: { isActive: true },
+          select: { id: true }
+        });
+      } else {
+        // Regular users can only access permitted WhatsApp numbers
+        const permissions = await prisma.waNumberPermission.findMany({
+          where: { userId: decoded.userId },
+          include: { 
+            whatsappNumber: { 
+              select: { id: true, isActive: true } 
+            } 
+          }
+        });
+        
+        // Only include active WhatsApp numbers
+        whatsappNumbers = permissions
+          .filter(p => p.whatsappNumber.isActive)
+          .map(p => ({ id: p.whatsappNumber.id }));
+      }
 
       socket.userId = decoded.userId;
       socket.whatsappNumberIds = whatsappNumbers.map(num => num.id);
