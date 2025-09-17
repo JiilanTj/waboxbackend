@@ -203,6 +203,15 @@ exports.Prisma.WaNumberPermissionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ChatTemplateScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  content: 'content',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -273,6 +282,11 @@ exports.Prisma.MessageOrderByRelevanceFieldEnum = {
   quotedMessageId: 'quotedMessageId',
   quotedContent: 'quotedContent'
 };
+
+exports.Prisma.ChatTemplateOrderByRelevanceFieldEnum = {
+  name: 'name',
+  content: 'content'
+};
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',
   ADMIN: 'ADMIN'
@@ -312,7 +326,8 @@ exports.Prisma.ModelName = {
   WhatsAppSession: 'WhatsAppSession',
   Chat: 'Chat',
   Message: 'Message',
-  WaNumberPermission: 'WaNumberPermission'
+  WaNumberPermission: 'WaNumberPermission',
+  ChatTemplate: 'ChatTemplate'
 };
 
 /**

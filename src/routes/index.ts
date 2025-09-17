@@ -7,6 +7,7 @@ import sessionRoutes from './sessionRoutes';
 import chatRoutes from './chatRoutes';
 import realtimeRoutes from './realtimeRoutes';
 import permissionRoutes from './permissionRoutes';
+import chatTemplateRoutes from './chatTemplateRoutes';
 
 export const setupRoutes = (app: Application) => {
   // Mount all routes
@@ -17,6 +18,7 @@ export const setupRoutes = (app: Application) => {
   app.use(whatsappRoutes);
   app.use(sessionRoutes); // No prefix needed, routes already include full path
   app.use(chatRoutes); // Chat management routes
+  app.use(chatTemplateRoutes); // Chat Template routes (all users)
   app.use('/api/v1/realtime', realtimeRoutes); // Real-time Socket.io management
   
   // Add other routes here when needed

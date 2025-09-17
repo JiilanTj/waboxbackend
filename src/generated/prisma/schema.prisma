@@ -177,3 +177,15 @@ model WaNumberPermission {
   @@index([whatsappNumberId])
   @@map("wa_number_permissions")
 }
+
+model ChatTemplate {
+  id        Int      @id @default(autoincrement())
+  name      String
+  content   String   @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("chat_templates")
+}

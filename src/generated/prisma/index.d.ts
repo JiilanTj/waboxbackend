@@ -43,6 +43,11 @@ export type Message = $Result.DefaultSelection<Prisma.$MessagePayload>
  * 
  */
 export type WaNumberPermission = $Result.DefaultSelection<Prisma.$WaNumberPermissionPayload>
+/**
+ * Model ChatTemplate
+ * 
+ */
+export type ChatTemplate = $Result.DefaultSelection<Prisma.$ChatTemplatePayload>
 
 /**
  * Enums
@@ -287,6 +292,16 @@ export class PrismaClient<
     * ```
     */
   get waNumberPermission(): Prisma.WaNumberPermissionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.chatTemplate`: Exposes CRUD operations for the **ChatTemplate** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ChatTemplates
+    * const chatTemplates = await prisma.chatTemplate.findMany()
+    * ```
+    */
+  get chatTemplate(): Prisma.ChatTemplateDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -732,7 +747,8 @@ export namespace Prisma {
     WhatsAppSession: 'WhatsAppSession',
     Chat: 'Chat',
     Message: 'Message',
-    WaNumberPermission: 'WaNumberPermission'
+    WaNumberPermission: 'WaNumberPermission',
+    ChatTemplate: 'ChatTemplate'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -751,7 +767,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "whatsAppNumber" | "whatsAppSession" | "chat" | "message" | "waNumberPermission"
+      modelProps: "user" | "whatsAppNumber" | "whatsAppSession" | "chat" | "message" | "waNumberPermission" | "chatTemplate"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1151,6 +1167,72 @@ export namespace Prisma {
           }
         }
       }
+      ChatTemplate: {
+        payload: Prisma.$ChatTemplatePayload<ExtArgs>
+        fields: Prisma.ChatTemplateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ChatTemplateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ChatTemplateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          findFirst: {
+            args: Prisma.ChatTemplateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ChatTemplateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          findMany: {
+            args: Prisma.ChatTemplateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>[]
+          }
+          create: {
+            args: Prisma.ChatTemplateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          createMany: {
+            args: Prisma.ChatTemplateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ChatTemplateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          update: {
+            args: Prisma.ChatTemplateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          deleteMany: {
+            args: Prisma.ChatTemplateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ChatTemplateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ChatTemplateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ChatTemplatePayload>
+          }
+          aggregate: {
+            args: Prisma.ChatTemplateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateChatTemplate>
+          }
+          groupBy: {
+            args: Prisma.ChatTemplateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ChatTemplateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ChatTemplateCountArgs<ExtArgs>
+            result: $Utils.Optional<ChatTemplateCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1253,6 +1335,7 @@ export namespace Prisma {
     chat?: ChatOmit
     message?: MessageOmit
     waNumberPermission?: WaNumberPermissionOmit
+    chatTemplate?: ChatTemplateOmit
   }
 
   /* Types for Logging */
@@ -7753,6 +7836,933 @@ export namespace Prisma {
 
 
   /**
+   * Model ChatTemplate
+   */
+
+  export type AggregateChatTemplate = {
+    _count: ChatTemplateCountAggregateOutputType | null
+    _avg: ChatTemplateAvgAggregateOutputType | null
+    _sum: ChatTemplateSumAggregateOutputType | null
+    _min: ChatTemplateMinAggregateOutputType | null
+    _max: ChatTemplateMaxAggregateOutputType | null
+  }
+
+  export type ChatTemplateAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ChatTemplateSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type ChatTemplateMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    content: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChatTemplateMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    content: string | null
+    isActive: boolean | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ChatTemplateCountAggregateOutputType = {
+    id: number
+    name: number
+    content: number
+    isActive: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ChatTemplateAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type ChatTemplateSumAggregateInputType = {
+    id?: true
+  }
+
+  export type ChatTemplateMinAggregateInputType = {
+    id?: true
+    name?: true
+    content?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChatTemplateMaxAggregateInputType = {
+    id?: true
+    name?: true
+    content?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ChatTemplateCountAggregateInputType = {
+    id?: true
+    name?: true
+    content?: true
+    isActive?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ChatTemplateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ChatTemplate to aggregate.
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatTemplates to fetch.
+     */
+    orderBy?: ChatTemplateOrderByWithRelationInput | ChatTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ChatTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ChatTemplates
+    **/
+    _count?: true | ChatTemplateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ChatTemplateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ChatTemplateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ChatTemplateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ChatTemplateMaxAggregateInputType
+  }
+
+  export type GetChatTemplateAggregateType<T extends ChatTemplateAggregateArgs> = {
+        [P in keyof T & keyof AggregateChatTemplate]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateChatTemplate[P]>
+      : GetScalarType<T[P], AggregateChatTemplate[P]>
+  }
+
+
+
+
+  export type ChatTemplateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ChatTemplateWhereInput
+    orderBy?: ChatTemplateOrderByWithAggregationInput | ChatTemplateOrderByWithAggregationInput[]
+    by: ChatTemplateScalarFieldEnum[] | ChatTemplateScalarFieldEnum
+    having?: ChatTemplateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ChatTemplateCountAggregateInputType | true
+    _avg?: ChatTemplateAvgAggregateInputType
+    _sum?: ChatTemplateSumAggregateInputType
+    _min?: ChatTemplateMinAggregateInputType
+    _max?: ChatTemplateMaxAggregateInputType
+  }
+
+  export type ChatTemplateGroupByOutputType = {
+    id: number
+    name: string
+    content: string
+    isActive: boolean
+    createdAt: Date
+    updatedAt: Date
+    _count: ChatTemplateCountAggregateOutputType | null
+    _avg: ChatTemplateAvgAggregateOutputType | null
+    _sum: ChatTemplateSumAggregateOutputType | null
+    _min: ChatTemplateMinAggregateOutputType | null
+    _max: ChatTemplateMaxAggregateOutputType | null
+  }
+
+  type GetChatTemplateGroupByPayload<T extends ChatTemplateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ChatTemplateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ChatTemplateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ChatTemplateGroupByOutputType[P]>
+            : GetScalarType<T[P], ChatTemplateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ChatTemplateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    content?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["chatTemplate"]>
+
+
+
+  export type ChatTemplateSelectScalar = {
+    id?: boolean
+    name?: boolean
+    content?: boolean
+    isActive?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ChatTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "content" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["chatTemplate"]>
+
+  export type $ChatTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ChatTemplate"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      content: string
+      isActive: boolean
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["chatTemplate"]>
+    composites: {}
+  }
+
+  type ChatTemplateGetPayload<S extends boolean | null | undefined | ChatTemplateDefaultArgs> = $Result.GetResult<Prisma.$ChatTemplatePayload, S>
+
+  type ChatTemplateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ChatTemplateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ChatTemplateCountAggregateInputType | true
+    }
+
+  export interface ChatTemplateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ChatTemplate'], meta: { name: 'ChatTemplate' } }
+    /**
+     * Find zero or one ChatTemplate that matches the filter.
+     * @param {ChatTemplateFindUniqueArgs} args - Arguments to find a ChatTemplate
+     * @example
+     * // Get one ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ChatTemplateFindUniqueArgs>(args: SelectSubset<T, ChatTemplateFindUniqueArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ChatTemplate that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ChatTemplateFindUniqueOrThrowArgs} args - Arguments to find a ChatTemplate
+     * @example
+     * // Get one ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ChatTemplateFindUniqueOrThrowArgs>(args: SelectSubset<T, ChatTemplateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ChatTemplate that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateFindFirstArgs} args - Arguments to find a ChatTemplate
+     * @example
+     * // Get one ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ChatTemplateFindFirstArgs>(args?: SelectSubset<T, ChatTemplateFindFirstArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ChatTemplate that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateFindFirstOrThrowArgs} args - Arguments to find a ChatTemplate
+     * @example
+     * // Get one ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ChatTemplateFindFirstOrThrowArgs>(args?: SelectSubset<T, ChatTemplateFindFirstOrThrowArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ChatTemplates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ChatTemplates
+     * const chatTemplates = await prisma.chatTemplate.findMany()
+     * 
+     * // Get first 10 ChatTemplates
+     * const chatTemplates = await prisma.chatTemplate.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const chatTemplateWithIdOnly = await prisma.chatTemplate.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ChatTemplateFindManyArgs>(args?: SelectSubset<T, ChatTemplateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ChatTemplate.
+     * @param {ChatTemplateCreateArgs} args - Arguments to create a ChatTemplate.
+     * @example
+     * // Create one ChatTemplate
+     * const ChatTemplate = await prisma.chatTemplate.create({
+     *   data: {
+     *     // ... data to create a ChatTemplate
+     *   }
+     * })
+     * 
+     */
+    create<T extends ChatTemplateCreateArgs>(args: SelectSubset<T, ChatTemplateCreateArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ChatTemplates.
+     * @param {ChatTemplateCreateManyArgs} args - Arguments to create many ChatTemplates.
+     * @example
+     * // Create many ChatTemplates
+     * const chatTemplate = await prisma.chatTemplate.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ChatTemplateCreateManyArgs>(args?: SelectSubset<T, ChatTemplateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ChatTemplate.
+     * @param {ChatTemplateDeleteArgs} args - Arguments to delete one ChatTemplate.
+     * @example
+     * // Delete one ChatTemplate
+     * const ChatTemplate = await prisma.chatTemplate.delete({
+     *   where: {
+     *     // ... filter to delete one ChatTemplate
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ChatTemplateDeleteArgs>(args: SelectSubset<T, ChatTemplateDeleteArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ChatTemplate.
+     * @param {ChatTemplateUpdateArgs} args - Arguments to update one ChatTemplate.
+     * @example
+     * // Update one ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ChatTemplateUpdateArgs>(args: SelectSubset<T, ChatTemplateUpdateArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ChatTemplates.
+     * @param {ChatTemplateDeleteManyArgs} args - Arguments to filter ChatTemplates to delete.
+     * @example
+     * // Delete a few ChatTemplates
+     * const { count } = await prisma.chatTemplate.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ChatTemplateDeleteManyArgs>(args?: SelectSubset<T, ChatTemplateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ChatTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ChatTemplates
+     * const chatTemplate = await prisma.chatTemplate.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ChatTemplateUpdateManyArgs>(args: SelectSubset<T, ChatTemplateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ChatTemplate.
+     * @param {ChatTemplateUpsertArgs} args - Arguments to update or create a ChatTemplate.
+     * @example
+     * // Update or create a ChatTemplate
+     * const chatTemplate = await prisma.chatTemplate.upsert({
+     *   create: {
+     *     // ... data to create a ChatTemplate
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ChatTemplate we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ChatTemplateUpsertArgs>(args: SelectSubset<T, ChatTemplateUpsertArgs<ExtArgs>>): Prisma__ChatTemplateClient<$Result.GetResult<Prisma.$ChatTemplatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ChatTemplates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateCountArgs} args - Arguments to filter ChatTemplates to count.
+     * @example
+     * // Count the number of ChatTemplates
+     * const count = await prisma.chatTemplate.count({
+     *   where: {
+     *     // ... the filter for the ChatTemplates we want to count
+     *   }
+     * })
+    **/
+    count<T extends ChatTemplateCountArgs>(
+      args?: Subset<T, ChatTemplateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ChatTemplateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ChatTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ChatTemplateAggregateArgs>(args: Subset<T, ChatTemplateAggregateArgs>): Prisma.PrismaPromise<GetChatTemplateAggregateType<T>>
+
+    /**
+     * Group by ChatTemplate.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ChatTemplateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ChatTemplateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ChatTemplateGroupByArgs['orderBy'] }
+        : { orderBy?: ChatTemplateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ChatTemplateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetChatTemplateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ChatTemplate model
+   */
+  readonly fields: ChatTemplateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ChatTemplate.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ChatTemplateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ChatTemplate model
+   */
+  interface ChatTemplateFieldRefs {
+    readonly id: FieldRef<"ChatTemplate", 'Int'>
+    readonly name: FieldRef<"ChatTemplate", 'String'>
+    readonly content: FieldRef<"ChatTemplate", 'String'>
+    readonly isActive: FieldRef<"ChatTemplate", 'Boolean'>
+    readonly createdAt: FieldRef<"ChatTemplate", 'DateTime'>
+    readonly updatedAt: FieldRef<"ChatTemplate", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ChatTemplate findUnique
+   */
+  export type ChatTemplateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter, which ChatTemplate to fetch.
+     */
+    where: ChatTemplateWhereUniqueInput
+  }
+
+  /**
+   * ChatTemplate findUniqueOrThrow
+   */
+  export type ChatTemplateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter, which ChatTemplate to fetch.
+     */
+    where: ChatTemplateWhereUniqueInput
+  }
+
+  /**
+   * ChatTemplate findFirst
+   */
+  export type ChatTemplateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter, which ChatTemplate to fetch.
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatTemplates to fetch.
+     */
+    orderBy?: ChatTemplateOrderByWithRelationInput | ChatTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ChatTemplates.
+     */
+    cursor?: ChatTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatTemplates.
+     */
+    distinct?: ChatTemplateScalarFieldEnum | ChatTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * ChatTemplate findFirstOrThrow
+   */
+  export type ChatTemplateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter, which ChatTemplate to fetch.
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatTemplates to fetch.
+     */
+    orderBy?: ChatTemplateOrderByWithRelationInput | ChatTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ChatTemplates.
+     */
+    cursor?: ChatTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatTemplates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ChatTemplates.
+     */
+    distinct?: ChatTemplateScalarFieldEnum | ChatTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * ChatTemplate findMany
+   */
+  export type ChatTemplateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter, which ChatTemplates to fetch.
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ChatTemplates to fetch.
+     */
+    orderBy?: ChatTemplateOrderByWithRelationInput | ChatTemplateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ChatTemplates.
+     */
+    cursor?: ChatTemplateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ChatTemplates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ChatTemplates.
+     */
+    skip?: number
+    distinct?: ChatTemplateScalarFieldEnum | ChatTemplateScalarFieldEnum[]
+  }
+
+  /**
+   * ChatTemplate create
+   */
+  export type ChatTemplateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ChatTemplate.
+     */
+    data: XOR<ChatTemplateCreateInput, ChatTemplateUncheckedCreateInput>
+  }
+
+  /**
+   * ChatTemplate createMany
+   */
+  export type ChatTemplateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ChatTemplates.
+     */
+    data: ChatTemplateCreateManyInput | ChatTemplateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ChatTemplate update
+   */
+  export type ChatTemplateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ChatTemplate.
+     */
+    data: XOR<ChatTemplateUpdateInput, ChatTemplateUncheckedUpdateInput>
+    /**
+     * Choose, which ChatTemplate to update.
+     */
+    where: ChatTemplateWhereUniqueInput
+  }
+
+  /**
+   * ChatTemplate updateMany
+   */
+  export type ChatTemplateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ChatTemplates.
+     */
+    data: XOR<ChatTemplateUpdateManyMutationInput, ChatTemplateUncheckedUpdateManyInput>
+    /**
+     * Filter which ChatTemplates to update
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * Limit how many ChatTemplates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ChatTemplate upsert
+   */
+  export type ChatTemplateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ChatTemplate to update in case it exists.
+     */
+    where: ChatTemplateWhereUniqueInput
+    /**
+     * In case the ChatTemplate found by the `where` argument doesn't exist, create a new ChatTemplate with this data.
+     */
+    create: XOR<ChatTemplateCreateInput, ChatTemplateUncheckedCreateInput>
+    /**
+     * In case the ChatTemplate was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ChatTemplateUpdateInput, ChatTemplateUncheckedUpdateInput>
+  }
+
+  /**
+   * ChatTemplate delete
+   */
+  export type ChatTemplateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+    /**
+     * Filter which ChatTemplate to delete.
+     */
+    where: ChatTemplateWhereUniqueInput
+  }
+
+  /**
+   * ChatTemplate deleteMany
+   */
+  export type ChatTemplateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ChatTemplates to delete
+     */
+    where?: ChatTemplateWhereInput
+    /**
+     * Limit how many ChatTemplates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ChatTemplate without action
+   */
+  export type ChatTemplateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ChatTemplate
+     */
+    select?: ChatTemplateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ChatTemplate
+     */
+    omit?: ChatTemplateOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -7867,6 +8877,18 @@ export namespace Prisma {
   export type WaNumberPermissionScalarFieldEnum = (typeof WaNumberPermissionScalarFieldEnum)[keyof typeof WaNumberPermissionScalarFieldEnum]
 
 
+  export const ChatTemplateScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    content: 'content',
+    isActive: 'isActive',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ChatTemplateScalarFieldEnum = (typeof ChatTemplateScalarFieldEnum)[keyof typeof ChatTemplateScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -7966,6 +8988,14 @@ export namespace Prisma {
   };
 
   export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
+
+
+  export const ChatTemplateOrderByRelevanceFieldEnum: {
+    name: 'name',
+    content: 'content'
+  };
+
+  export type ChatTemplateOrderByRelevanceFieldEnum = (typeof ChatTemplateOrderByRelevanceFieldEnum)[keyof typeof ChatTemplateOrderByRelevanceFieldEnum]
 
 
   /**
@@ -8590,6 +9620,66 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"WaNumberPermission"> | Date | string
   }
 
+  export type ChatTemplateWhereInput = {
+    AND?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
+    OR?: ChatTemplateWhereInput[]
+    NOT?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
+    id?: IntFilter<"ChatTemplate"> | number
+    name?: StringFilter<"ChatTemplate"> | string
+    content?: StringFilter<"ChatTemplate"> | string
+    isActive?: BoolFilter<"ChatTemplate"> | boolean
+    createdAt?: DateTimeFilter<"ChatTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"ChatTemplate"> | Date | string
+  }
+
+  export type ChatTemplateOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    content?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _relevance?: ChatTemplateOrderByRelevanceInput
+  }
+
+  export type ChatTemplateWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
+    OR?: ChatTemplateWhereInput[]
+    NOT?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
+    name?: StringFilter<"ChatTemplate"> | string
+    content?: StringFilter<"ChatTemplate"> | string
+    isActive?: BoolFilter<"ChatTemplate"> | boolean
+    createdAt?: DateTimeFilter<"ChatTemplate"> | Date | string
+    updatedAt?: DateTimeFilter<"ChatTemplate"> | Date | string
+  }, "id">
+
+  export type ChatTemplateOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    content?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ChatTemplateCountOrderByAggregateInput
+    _avg?: ChatTemplateAvgOrderByAggregateInput
+    _max?: ChatTemplateMaxOrderByAggregateInput
+    _min?: ChatTemplateMinOrderByAggregateInput
+    _sum?: ChatTemplateSumOrderByAggregateInput
+  }
+
+  export type ChatTemplateScalarWhereWithAggregatesInput = {
+    AND?: ChatTemplateScalarWhereWithAggregatesInput | ChatTemplateScalarWhereWithAggregatesInput[]
+    OR?: ChatTemplateScalarWhereWithAggregatesInput[]
+    NOT?: ChatTemplateScalarWhereWithAggregatesInput | ChatTemplateScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"ChatTemplate"> | number
+    name?: StringWithAggregatesFilter<"ChatTemplate"> | string
+    content?: StringWithAggregatesFilter<"ChatTemplate"> | string
+    isActive?: BoolWithAggregatesFilter<"ChatTemplate"> | boolean
+    createdAt?: DateTimeWithAggregatesFilter<"ChatTemplate"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ChatTemplate"> | Date | string
+  }
+
   export type UserCreateInput = {
     name: string
     username: string
@@ -9173,6 +10263,66 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     userId?: IntFieldUpdateOperationsInput | number
     whatsappNumberId?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatTemplateCreateInput = {
+    name: string
+    content: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatTemplateUncheckedCreateInput = {
+    id?: number
+    name: string
+    content: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatTemplateUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatTemplateUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatTemplateCreateManyInput = {
+    id?: number
+    name: string
+    content: string
+    isActive?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ChatTemplateUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ChatTemplateUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    content?: StringFieldUpdateOperationsInput | string
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9879,6 +11029,47 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     whatsappNumberId?: SortOrder
+  }
+
+  export type ChatTemplateOrderByRelevanceInput = {
+    fields: ChatTemplateOrderByRelevanceFieldEnum | ChatTemplateOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type ChatTemplateCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    content?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChatTemplateAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type ChatTemplateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    content?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChatTemplateMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    content?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ChatTemplateSumOrderByAggregateInput = {
+    id?: SortOrder
   }
 
   export type WaNumberPermissionCreateNestedManyWithoutUserInput = {
