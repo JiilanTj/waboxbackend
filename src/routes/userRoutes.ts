@@ -10,8 +10,8 @@ import { authenticateToken, requireAdmin } from '../utils/middleware';
 
 const router = Router();
 
-// All user routes require admin authentication
-router.use(authenticateToken, requireAdmin);
+// All user routes require admin authentication (scoped to /api/v1/users only)
+router.use('/api/v1/users', authenticateToken, requireAdmin);
 
 /**
  * @swagger

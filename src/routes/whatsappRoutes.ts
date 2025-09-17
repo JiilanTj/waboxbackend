@@ -7,7 +7,7 @@ import {
   deleteWhatsAppNumber,
   toggleWhatsAppNumberStatus
 } from '../controllers/whatsappController';
-import { authenticateToken } from '../utils/middleware';
+import { authenticateToken, requireAdmin } from '../utils/middleware';
 
 const router = Router();
 
@@ -20,9 +20,9 @@ router.use(authenticateToken);
  *   get:
  *     summary: Get all WhatsApp numbers
  *     description: Retrieve all WhatsApp numbers with pagination and filtering
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -87,9 +87,9 @@ router.get('/api/v1/whatsapp', getWhatsAppNumbers);
  *   post:
  *     summary: Create new WhatsApp number (Admin only)
  *     description: Add a new WhatsApp number to the system
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -143,7 +143,7 @@ router.get('/api/v1/whatsapp', getWhatsAppNumbers);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.post('/api/v1/whatsapp', createWhatsAppNumber);
+router.post('/api/v1/whatsapp', requireAdmin, createWhatsAppNumber);
 
 /**
  * @swagger
@@ -151,9 +151,9 @@ router.post('/api/v1/whatsapp', createWhatsAppNumber);
  *   get:
  *     summary: Get WhatsApp number by ID
  *     description: Retrieve a specific WhatsApp number by its ID
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -204,9 +204,9 @@ router.get('/api/v1/whatsapp/:id', getWhatsAppNumberById);
  *   put:
  *     summary: Update WhatsApp number (Admin only)
  *     description: Update an existing WhatsApp number's information
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -282,7 +282,7 @@ router.get('/api/v1/whatsapp/:id', getWhatsAppNumberById);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.put('/api/v1/whatsapp/:id', updateWhatsAppNumber);
+router.put('/api/v1/whatsapp/:id', requireAdmin, updateWhatsAppNumber);
 
 /**
  * @swagger
@@ -290,9 +290,9 @@ router.put('/api/v1/whatsapp/:id', updateWhatsAppNumber);
  *   delete:
  *     summary: Delete WhatsApp number (Admin only)
  *     description: Remove a WhatsApp number from the system
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -342,7 +342,7 @@ router.put('/api/v1/whatsapp/:id', updateWhatsAppNumber);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.delete('/api/v1/whatsapp/:id', deleteWhatsAppNumber);
+router.delete('/api/v1/whatsapp/:id', requireAdmin, deleteWhatsAppNumber);
 
 /**
  * @swagger
@@ -350,9 +350,9 @@ router.delete('/api/v1/whatsapp/:id', deleteWhatsAppNumber);
  *   patch:
  *     summary: Toggle WhatsApp number status (Admin only)
  *     description: Toggle the active/inactive status of a WhatsApp number
- *     tags: [WhatsApp Management]
+ *     tags: [WhatsApp Numbers]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -404,6 +404,6 @@ router.delete('/api/v1/whatsapp/:id', deleteWhatsAppNumber);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-router.patch('/api/v1/whatsapp/:id/toggle-status', toggleWhatsAppNumberStatus);
+router.patch('/api/v1/whatsapp/:id/toggle-status', requireAdmin, toggleWhatsAppNumberStatus);
 
 export default router;
