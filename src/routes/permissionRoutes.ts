@@ -3,7 +3,8 @@ import {
   createPermission,
   getMyPermissions,
   getPermissionsByUser,
-  getAllPermissions
+  getAllPermissions,
+  deletePermission
 } from '../controllers/permissionController';
 import { authenticateToken } from '../utils/middleware';
 
@@ -73,7 +74,7 @@ router.get('/api/v1/wapermission/me', getMyPermissions);
  * /api/v1/wapermission/user/{userId}:
  *   get:
  *     summary: Get permissions by user ID
- *     description: Admins can view any user's permissions. Non-admins can only view their own.
+ *     description: Admins can view any user's permissions. Non-admins can only view their own. If the target user is an ADMIN, the endpoint returns all permissions.
  *     tags: [WaPermissions]
  *     security:
  *       - BearerAuth: []
@@ -122,5 +123,35 @@ router.get('/api/v1/wapermission/user/:userId', getPermissionsByUser);
  *         description: Unauthorized
  */
 router.get('/api/v1/wapermission', getAllPermissions);
+
+/**
+ * @swagger
+ * /api/v1/wapermission/{id}:
+ *   delete:
+ *     summary: Delete a permission by ID
+ *     description: Admins can delete any; non-admins can only delete their own permissions.
+ *     tags: [WaPermissions]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: WaNumberPermission ID (primary key)
+ *     responses:
+ *       200:
+ *         description: Permission deleted successfully
+ *       400:
+ *         description: Invalid permission id
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Permission not found
+ */
+router.delete('/api/v1/wapermission/:id', deletePermission);
 
 export default router;

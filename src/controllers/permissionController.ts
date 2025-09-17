@@ -18,6 +18,15 @@ const formatPermission = (perm: any) => ({
   updatedAt: perm.updatedAt
 });
 
+// Helper: format WhatsAppNumber response
+const formatWhatsAppNumber = (n: any) => ({
+  id: n.id,
+  name: n.name,
+  phoneNumber: n.phoneNumber,
+  isActive: n.isActive,
+  createdAt: n.createdAt
+});
+
 /**
  * Create permission (assign WhatsApp number to a user)
  * - Non-admin: can only create for themselves
@@ -127,6 +136,7 @@ export const getMyPermissions = async (req: Request, res: Response): Promise<voi
  * Get permissions by user id
  * - Non-admin can only view their own permissions
  * - Admin can view any user
+ *   - If the target user has ADMIN role, return all WhatsApp numbers as permission-shaped objects
  * @route GET /api/v1/wapermission/user/:userId
  */
 export const getPermissionsByUser = async (req: Request, res: Response): Promise<void> => {
@@ -148,6 +158,42 @@ export const getPermissionsByUser = async (req: Request, res: Response): Promise
       return;
     }
 
+    // Fetch target user to determine role
+    const targetUser = await prisma.user.findUnique({ where: { id: paramUserId } });
+    if (!targetUser) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    // If target user is an ADMIN, return all WhatsApp numbers formatted as permissions
+    if (targetUser.role === 'ADMIN') {
+      const [numbers, existingPerms] = await Promise.all([
+        prisma.whatsAppNumber.findMany({ orderBy: { createdAt: 'desc' } }),
+        prisma.waNumberPermission.findMany({ where: { userId: paramUserId } })
+      ]);
+
+      const permByNumberId = new Map<number, any>(existingPerms.map(p => [p.whatsappNumberId, p]));
+      const data = numbers.map(n => {
+        const p = permByNumberId.get(n.id);
+        return formatPermission({
+          id: p?.id ?? null,
+          userId: paramUserId,
+          whatsappNumberId: n.id,
+          whatsappNumber: n,
+          createdAt: p?.createdAt ?? null,
+          updatedAt: p?.updatedAt ?? null
+        });
+      });
+
+      res.json({
+        success: true,
+        message: 'Permissions retrieved successfully',
+        data
+      });
+      return;
+    }
+
+    // Otherwise, return that user's permissions
     const permissions = await prisma.waNumberPermission.findMany({
       where: { userId: paramUserId },
       include: { whatsappNumber: true },
@@ -212,6 +258,56 @@ export const getAllPermissions = async (req: Request, res: Response): Promise<vo
     });
   } catch (error) {
     console.error('Get all permissions error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Delete a permission by ID
+ * - Non-admin: can only delete own permission
+ * - Admin: can delete any permission
+ * @route DELETE /api/v1/wapermission/:id
+ */
+export const deletePermission = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const requester = req.user;
+    const id = Number(req.params.id);
+
+    if (!requester) {
+      res.status(401).json({ success: false, message: 'User not authenticated' });
+      return;
+    }
+
+    if (isNaN(id)) {
+      res.status(400).json({ success: false, message: 'Invalid permission id' });
+      return;
+    }
+
+    const permission = await prisma.waNumberPermission.findUnique({
+      where: { id },
+      include: { whatsappNumber: true }
+    });
+
+    if (!permission) {
+      res.status(404).json({ success: false, message: 'Permission not found' });
+      return;
+    }
+
+    // Authorization check
+    if (requester.role !== 'ADMIN' && permission.userId !== requester.userId) {
+      res.status(403).json({ success: false, message: 'Forbidden' });
+      return;
+    }
+
+    await prisma.waNumberPermission.delete({ where: { id } });
+
+    res.json({
+      success: true,
+      message: 'Permission deleted successfully',
+      data: formatPermission(permission)
+    });
+  } catch (error) {
+    console.error('Delete permission error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
