@@ -359,7 +359,8 @@ export const deactivateSession = async (req: Request, res: Response): Promise<vo
     const { sessionId } = req.params;
 
     const session = await prisma.whatsAppSession.findUnique({
-      where: { id: sessionId }
+      where: { id: sessionId },
+      include: { whatsappNumber: { select: { id: true } } }
     });
 
     if (!session) {

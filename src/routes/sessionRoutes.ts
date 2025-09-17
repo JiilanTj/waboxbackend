@@ -9,7 +9,7 @@ import {
   deleteSession,
   sendMessage
 } from '../controllers/sessionController';
-import { authenticateToken } from '../utils/middleware';
+import { authenticateToken, requireAdmin } from '../utils/middleware';
 
 const router = Router();
 
@@ -175,7 +175,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/api/v1/sessions/:whatsappNumberId', authenticateToken, createOrUpdateSession);
+router.post('/api/v1/sessions/:whatsappNumberId', authenticateToken, requireAdmin, createOrUpdateSession);
 router.get('/api/v1/sessions/:whatsappNumberId', authenticateToken, getSessionByWhatsappNumber);
 
 /**
@@ -293,7 +293,7 @@ router.get('/api/v1/sessions', authenticateToken, getAllSessions);
  *       500:
  *         description: Internal server error
  */
-router.patch('/api/v1/sessions/:sessionId/status', authenticateToken, updateSessionStatus);
+router.patch('/api/v1/sessions/:sessionId/status', authenticateToken, requireAdmin, updateSessionStatus);
 
 /**
  * @swagger
@@ -419,7 +419,7 @@ router.delete('/api/v1/sessions/:sessionId', authenticateToken, deactivateSessio
  *       500:
  *         description: Internal server error
  */
-router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, deleteSession);
+router.delete('/api/v1/sessions/:sessionId/permanent', authenticateToken, requireAdmin, deleteSession);
 
 /**
  * @swagger
