@@ -3,644 +3,215 @@ import { PrismaClient } from '../generated/prisma';
 
 const prisma = new PrismaClient();
 
+// Helper: format permission response
+const formatPermission = (perm: any) => ({
+  id: perm.id,
+  userId: perm.userId,
+  whatsappNumberId: perm.whatsappNumberId,
+  whatsappNumber: perm.whatsappNumber ? {
+    id: perm.whatsappNumber.id,
+    name: perm.whatsappNumber.name,
+    phoneNumber: perm.whatsappNumber.phoneNumber,
+    isActive: perm.whatsappNumber.isActive
+  } : undefined,
+  createdAt: perm.createdAt,
+  updatedAt: perm.updatedAt
+});
+
 /**
- * Create WhatsApp number permission for a user
- * @route POST /api/v1/permissions
- * @access Admin only
+ * Create permission (assign WhatsApp number to a user)
+ * - Non-admin: can only create for themselves
+ * - Admin: can create for any user
+ * @route POST /api/v1/wapermission
  */
 export const createPermission = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId, whatsappNumberId } = req.body;
+    const requester = req.user; // set by auth middleware
+    const { userId: bodyUserId, whatsappNumberId } = req.body;
 
-    // Validate input
-    if (!userId || !whatsappNumberId) {
-      res.status(400).json({
-        success: false,
-        message: 'userId and whatsappNumberId are required'
-      });
+    if (!whatsappNumberId) {
+      res.status(400).json({ success: false, message: 'whatsappNumberId is required' });
       return;
     }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { id: parseInt(userId) }
-    });
+    // Determine target userId
+    const targetUserId = (requester?.role === 'ADMIN' && bodyUserId) ? Number(bodyUserId) : requester?.userId;
 
+    if (!targetUserId) {
+      res.status(401).json({ success: false, message: 'User not authenticated' });
+      return;
+    }
+
+    const waId = Number(whatsappNumberId);
+    if (isNaN(waId)) {
+      res.status(400).json({ success: false, message: 'Invalid whatsappNumberId' });
+      return;
+    }
+
+    // If non-admin tries to create for another user -> forbidden
+    if (requester?.role !== 'ADMIN' && bodyUserId && Number(bodyUserId) !== requester?.userId) {
+      res.status(403).json({ success: false, message: 'You can only create permissions for yourself' });
+      return;
+    }
+
+    // Validate target user exists
+    const user = await prisma.user.findUnique({ where: { id: targetUserId } });
     if (!user) {
-      res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+      res.status(404).json({ success: false, message: 'User not found' });
       return;
     }
 
-    // Check if WhatsApp number exists
-    const whatsappNumber = await prisma.whatsAppNumber.findUnique({
-      where: { id: parseInt(whatsappNumberId) }
+    // Validate WhatsApp number exists
+    const waNumber = await prisma.whatsAppNumber.findUnique({ where: { id: waId } });
+    if (!waNumber) {
+      res.status(404).json({ success: false, message: 'WhatsApp number not found' });
+      return;
+    }
+
+    // Check duplicate
+    const existing = await prisma.waNumberPermission.findUnique({
+      where: { userId_whatsappNumberId: { userId: targetUserId, whatsappNumberId: waId } }
     });
 
-    if (!whatsappNumber) {
-      res.status(404).json({
-        success: false,
-        message: 'WhatsApp number not found'
-      });
+    if (existing) {
+      res.status(409).json({ success: false, message: 'Permission already exists for this user and WhatsApp number' });
       return;
     }
 
-    // Check if permission already exists
-    const existingPermission = await prisma.waNumberPermission.findFirst({
-      where: {
-        userId: parseInt(userId),
-        whatsappNumberId: parseInt(whatsappNumberId)
-      }
-    });
-
-    if (existingPermission) {
-      res.status(409).json({
-        success: false,
-        message: 'Permission already exists for this user and WhatsApp number'
-      });
-      return;
-    }
-
-    // Create permission
-    const permission = await prisma.waNumberPermission.create({
-      data: {
-        userId: parseInt(userId),
-        whatsappNumberId: parseInt(whatsappNumberId)
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            email: true
-          }
-        },
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true
-          }
-        }
-      }
+    const created = await prisma.waNumberPermission.create({
+      data: { userId: targetUserId, whatsappNumberId: waId },
+      include: { whatsappNumber: true }
     });
 
     res.status(201).json({
       success: true,
       message: 'Permission created successfully',
-      data: permission
+      data: formatPermission(created)
     });
-
   } catch (error) {
     console.error('Create permission error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while creating permission'
-    });
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
 /**
- * Get current user's WhatsApp permissions
- * @route GET /api/v1/permissions/me
- * @access Authenticated user
+ * Get permissions for current user (from middleware)
+ * @route GET /api/v1/wapermission/me
  */
 export const getMyPermissions = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.userId;
-    const userRole = req.user?.role;
-    const username = req.user?.username;
-
-    console.log('🔍 /permissions/me accessed by:', { userId, userRole, username });
-    console.log('🔍 req.user object:', req.user);
-
     if (!userId) {
-      console.log('❌ No userId in request - authentication failed');
-      res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
+      res.status(401).json({ success: false, message: 'User not authenticated' });
       return;
     }
 
-    console.log(`👤 Processing permissions for User ID: ${userId}, Role: ${userRole}`);
-
-    // Admin gets all WhatsApp numbers (full access)
-    if (userRole === 'ADMIN') {
-      console.log('🔐 Admin user detected - retrieving all WhatsApp numbers');
-      
-      const allWhatsAppNumbers = await prisma.whatsAppNumber.findMany({
-        select: {
-          id: true,
-          phoneNumber: true,
-          name: true,
-          isActive: true,
-          createdAt: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      });
-
-      console.log(`📊 Found ${allWhatsAppNumbers.length} WhatsApp numbers for admin`);
-
-      // Format response to match permission structure for consistency
-      const adminPermissions = allWhatsAppNumbers.map(wa => ({
-        id: null, // No actual permission record
-        userId: userId,
-        whatsappNumberId: wa.id,
-        createdAt: new Date(), // Current time as mock creation
-        updatedAt: new Date(),
-        whatsappNumber: wa,
-        isAdminAccess: true // Flag to indicate this is admin access
-      }));
-
-      res.status(200).json({
-        success: true,
-        message: 'Admin permissions retrieved successfully (full access)',
-        data: adminPermissions,
-        totalWhatsAppNumbers: allWhatsAppNumbers.length,
-        accessLevel: 'ADMIN_FULL_ACCESS'
-      });
-      return;
-    }
-
-    console.log('👤 Regular user detected - retrieving specific permissions');
-
-    // Regular user - get specific permissions only
     const permissions = await prisma.waNumberPermission.findMany({
-      where: {
-        userId: userId
-      },
-      include: {
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true,
-            createdAt: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      where: { userId },
+      include: { whatsappNumber: true },
+      orderBy: { createdAt: 'desc' }
     });
 
-    console.log(`📊 Found ${permissions.length} specific permissions for user`);
-
-    res.status(200).json({
+    res.json({
       success: true,
-      message: 'User permissions retrieved successfully',
-      data: permissions,
-      totalPermissions: permissions.length,
-      accessLevel: 'USER_LIMITED_ACCESS'
+      message: 'Permissions retrieved successfully',
+      data: permissions.map(formatPermission)
     });
-
   } catch (error) {
     console.error('Get my permissions error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while retrieving permissions'
-    });
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
 /**
- * Get all permissions (Admin only)
- * @route GET /api/v1/permissions
- * @access Admin only
- */
-export const getAllPermissions = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { userId, whatsappNumberId, limit = '50', offset = '0' } = req.query;
-
-    const limitInt = parseInt(limit as string);
-    const offsetInt = parseInt(offset as string);
-
-    // Build filter conditions
-    const whereConditions: any = {};
-
-    if (userId) {
-      whereConditions.userId = parseInt(userId as string);
-    }
-
-    if (whatsappNumberId) {
-      whereConditions.whatsappNumberId = parseInt(whatsappNumberId as string);
-    }
-
-    const permissions = await prisma.waNumberPermission.findMany({
-      where: whereConditions,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            email: true,
-            role: true
-          }
-        },
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      skip: offsetInt,
-      take: limitInt
-    });
-
-    // Get total count
-    const total = await prisma.waNumberPermission.count({
-      where: whereConditions
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'All permissions retrieved successfully',
-      data: permissions,
-      pagination: {
-        limit: limitInt,
-        offset: offsetInt,
-        total: total
-      }
-    });
-
-  } catch (error) {
-    console.error('Get all permissions error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while retrieving permissions'
-    });
-  }
-};
-
-/**
- * Update permission (Admin only)
- * @route PUT /api/v1/permissions/:id
- * @access Admin only
- */
-export const updatePermission = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const { userId, whatsappNumberId } = req.body;
-
-    const permissionId = parseInt(id);
-
-    if (isNaN(permissionId)) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid permission ID'
-      });
-      return;
-    }
-
-    // Check if permission exists
-    const existingPermission = await prisma.waNumberPermission.findUnique({
-      where: { id: permissionId }
-    });
-
-    if (!existingPermission) {
-      res.status(404).json({
-        success: false,
-        message: 'Permission not found'
-      });
-      return;
-    }
-
-    // Prepare update data
-    const updateData: any = {};
-
-    if (userId) {
-      // Validate user exists
-      const user = await prisma.user.findUnique({
-        where: { id: parseInt(userId) }
-      });
-
-      if (!user) {
-        res.status(404).json({
-          success: false,
-          message: 'User not found'
-        });
-        return;
-      }
-
-      updateData.userId = parseInt(userId);
-    }
-
-    if (whatsappNumberId) {
-      // Validate WhatsApp number exists
-      const whatsappNumber = await prisma.whatsAppNumber.findUnique({
-        where: { id: parseInt(whatsappNumberId) }
-      });
-
-      if (!whatsappNumber) {
-        res.status(404).json({
-          success: false,
-          message: 'WhatsApp number not found'
-        });
-        return;
-      }
-
-      updateData.whatsappNumberId = parseInt(whatsappNumberId);
-    }
-
-    // Check for duplicate if updating user or whatsapp number
-    if (updateData.userId || updateData.whatsappNumberId) {
-      const checkUserId = updateData.userId || existingPermission.userId;
-      const checkWhatsappNumberId = updateData.whatsappNumberId || existingPermission.whatsappNumberId;
-
-      const duplicate = await prisma.waNumberPermission.findFirst({
-        where: {
-          userId: checkUserId,
-          whatsappNumberId: checkWhatsappNumberId,
-          id: { not: permissionId }
-        }
-      });
-
-      if (duplicate) {
-        res.status(409).json({
-          success: false,
-          message: 'Permission already exists for this user and WhatsApp number'
-        });
-        return;
-      }
-    }
-
-    // Update permission
-    const updatedPermission = await prisma.waNumberPermission.update({
-      where: { id: permissionId },
-      data: updateData,
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            email: true
-          }
-        },
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true
-          }
-        }
-      }
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Permission updated successfully',
-      data: updatedPermission
-    });
-
-  } catch (error) {
-    console.error('Update permission error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while updating permission'
-    });
-  }
-};
-
-/**
- * Delete permission (Admin only)
- * @route DELETE /api/v1/permissions/:id
- * @access Admin only
- */
-export const deletePermission = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-
-    const permissionId = parseInt(id);
-
-    if (isNaN(permissionId)) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid permission ID'
-      });
-      return;
-    }
-
-    // Check if permission exists
-    const existingPermission = await prisma.waNumberPermission.findUnique({
-      where: { id: permissionId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            username: true
-          }
-        },
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true
-          }
-        }
-      }
-    });
-
-    if (!existingPermission) {
-      res.status(404).json({
-        success: false,
-        message: 'Permission not found'
-      });
-      return;
-    }
-
-    // Delete permission
-    await prisma.waNumberPermission.delete({
-      where: { id: permissionId }
-    });
-
-    res.status(200).json({
-      success: true,
-      message: 'Permission deleted successfully',
-      data: {
-        deletedPermission: existingPermission
-      }
-    });
-
-  } catch (error) {
-    console.error('Delete permission error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while deleting permission'
-    });
-  }
-};
-
-/**
- * Check if current user has permission for specific WhatsApp number
- * @route GET /api/v1/permissions/check/:whatsappNumberId
- * @access Authenticated user
- */
-export const checkPermission = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { whatsappNumberId } = req.params;
-    const userId = req.user?.userId;
-    const userRole = req.user?.role;
-
-    if (!userId) {
-      res.status(401).json({
-        success: false,
-        message: 'User not authenticated'
-      });
-      return;
-    }
-
-    const whatsappNumberIdInt = parseInt(whatsappNumberId);
-
-    if (isNaN(whatsappNumberIdInt)) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid WhatsApp number ID'
-      });
-      return;
-    }
-
-    // Admin has access to all WhatsApp numbers
-    if (userRole === 'ADMIN') {
-      res.status(200).json({
-        success: true,
-        message: 'Permission check completed',
-        data: {
-          hasPermission: true,
-          reason: 'Admin access'
-        }
-      });
-      return;
-    }
-
-    // Check specific permission for regular users
-    const permission = await prisma.waNumberPermission.findFirst({
-      where: {
-        userId: userId,
-        whatsappNumberId: whatsappNumberIdInt
-      },
-      include: {
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true
-          }
-        }
-      }
-    });
-
-    const hasPermission = !!permission;
-
-    res.status(200).json({
-      success: true,
-      message: 'Permission check completed',
-      data: {
-        hasPermission: hasPermission,
-        permission: permission,
-        reason: hasPermission ? 'User has explicit permission' : 'No permission found'
-      }
-    });
-
-  } catch (error) {
-    console.error('Check permission error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while checking permission'
-    });
-  }
-};
-
-/**
- * Get permissions by user ID (Admin only)
- * @route GET /api/v1/permissions/user/:userId
- * @access Admin only
+ * Get permissions by user id
+ * - Non-admin can only view their own permissions
+ * - Admin can view any user
+ * @route GET /api/v1/wapermission/user/:userId
  */
 export const getPermissionsByUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { userId } = req.params;
-
-    const userIdInt = parseInt(userId);
-
-    if (isNaN(userIdInt)) {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid user ID'
-      });
+    const requester = req.user;
+    const paramUserId = Number(req.params.userId);
+    if (isNaN(paramUserId)) {
+      res.status(400).json({ success: false, message: 'Invalid userId' });
       return;
     }
 
-    // Check if user exists
-    const user = await prisma.user.findUnique({
-      where: { id: userIdInt },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        email: true,
-        role: true
-      }
-    });
+    if (!requester) {
+      res.status(401).json({ success: false, message: 'User not authenticated' });
+      return;
+    }
 
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+    if (requester.role !== 'ADMIN' && requester.userId !== paramUserId) {
+      res.status(403).json({ success: false, message: 'Forbidden' });
       return;
     }
 
     const permissions = await prisma.waNumberPermission.findMany({
-      where: {
-        userId: userIdInt
-      },
-      include: {
-        whatsappNumber: {
-          select: {
-            id: true,
-            phoneNumber: true,
-            name: true,
-            isActive: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      where: { userId: paramUserId },
+      include: { whatsappNumber: true },
+      orderBy: { createdAt: 'desc' }
     });
 
-    res.status(200).json({
+    res.json({
       success: true,
-      message: 'User permissions retrieved successfully',
-      data: {
-        user: user,
-        permissions: permissions
-      }
+      message: 'Permissions retrieved successfully',
+      data: permissions.map(formatPermission)
     });
-
   } catch (error) {
     console.error('Get permissions by user error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Internal server error while retrieving user permissions'
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Get all permissions (paginated)
+ * - Admin: all users
+ * - Non-admin: only own permissions
+ * @route GET /api/v1/wapermission
+ */
+export const getAllPermissions = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const requester = req.user;
+    if (!requester) {
+      res.status(401).json({ success: false, message: 'User not authenticated' });
+      return;
+    }
+
+    const page = Number(req.query.page || 1);
+    const limit = Number(req.query.limit || 10);
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (requester.role !== 'ADMIN') {
+      where.userId = requester.userId;
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.waNumberPermission.findMany({
+        where,
+        include: { whatsappNumber: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.waNumberPermission.count({ where })
+    ]);
+
+    res.json({
+      success: true,
+      message: 'Permissions retrieved successfully',
+      data: items.map(formatPermission),
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        limit
+      }
     });
+  } catch (error) {
+    console.error('Get all permissions error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

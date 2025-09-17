@@ -70,6 +70,10 @@ const socket = io('http://localhost:5000', {
     {
       name: 'Application',
       description: 'General application endpoints (health check, etc.)'
+    },
+    {
+      name: 'WaPermissions',
+      description: 'WhatsApp number permissions management endpoints'
     }
   ],
   servers: [
