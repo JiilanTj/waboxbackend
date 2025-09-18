@@ -207,6 +207,7 @@ exports.Prisma.ChatTemplateScalarFieldEnum = {
   id: 'id',
   name: 'name',
   content: 'content',
+  commands: 'commands',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -285,7 +286,8 @@ exports.Prisma.MessageOrderByRelevanceFieldEnum = {
 
 exports.Prisma.ChatTemplateOrderByRelevanceFieldEnum = {
   name: 'name',
-  content: 'content'
+  content: 'content',
+  commands: 'commands'
 };
 exports.UserRole = exports.$Enums.UserRole = {
   USER: 'USER',

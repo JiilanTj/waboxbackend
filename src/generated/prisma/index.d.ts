@@ -7859,6 +7859,7 @@ export namespace Prisma {
     id: number | null
     name: string | null
     content: string | null
+    commands: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7868,6 +7869,7 @@ export namespace Prisma {
     id: number | null
     name: string | null
     content: string | null
+    commands: string | null
     isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -7877,6 +7879,7 @@ export namespace Prisma {
     id: number
     name: number
     content: number
+    commands: number
     isActive: number
     createdAt: number
     updatedAt: number
@@ -7896,6 +7899,7 @@ export namespace Prisma {
     id?: true
     name?: true
     content?: true
+    commands?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -7905,6 +7909,7 @@ export namespace Prisma {
     id?: true
     name?: true
     content?: true
+    commands?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -7914,6 +7919,7 @@ export namespace Prisma {
     id?: true
     name?: true
     content?: true
+    commands?: true
     isActive?: true
     createdAt?: true
     updatedAt?: true
@@ -8010,6 +8016,7 @@ export namespace Prisma {
     id: number
     name: string
     content: string
+    commands: string | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -8038,6 +8045,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     content?: boolean
+    commands?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -8049,12 +8057,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     content?: boolean
+    commands?: boolean
     isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ChatTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "content" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["chatTemplate"]>
+  export type ChatTemplateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "content" | "commands" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["chatTemplate"]>
 
   export type $ChatTemplatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ChatTemplate"
@@ -8063,6 +8072,7 @@ export namespace Prisma {
       id: number
       name: string
       content: string
+      commands: string | null
       isActive: boolean
       createdAt: Date
       updatedAt: Date
@@ -8438,6 +8448,7 @@ export namespace Prisma {
     readonly id: FieldRef<"ChatTemplate", 'Int'>
     readonly name: FieldRef<"ChatTemplate", 'String'>
     readonly content: FieldRef<"ChatTemplate", 'String'>
+    readonly commands: FieldRef<"ChatTemplate", 'String'>
     readonly isActive: FieldRef<"ChatTemplate", 'Boolean'>
     readonly createdAt: FieldRef<"ChatTemplate", 'DateTime'>
     readonly updatedAt: FieldRef<"ChatTemplate", 'DateTime'>
@@ -8881,6 +8892,7 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     content: 'content',
+    commands: 'commands',
     isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -8992,7 +9004,8 @@ export namespace Prisma {
 
   export const ChatTemplateOrderByRelevanceFieldEnum: {
     name: 'name',
-    content: 'content'
+    content: 'content',
+    commands: 'commands'
   };
 
   export type ChatTemplateOrderByRelevanceFieldEnum = (typeof ChatTemplateOrderByRelevanceFieldEnum)[keyof typeof ChatTemplateOrderByRelevanceFieldEnum]
@@ -9627,6 +9640,7 @@ export namespace Prisma {
     id?: IntFilter<"ChatTemplate"> | number
     name?: StringFilter<"ChatTemplate"> | string
     content?: StringFilter<"ChatTemplate"> | string
+    commands?: StringNullableFilter<"ChatTemplate"> | string | null
     isActive?: BoolFilter<"ChatTemplate"> | boolean
     createdAt?: DateTimeFilter<"ChatTemplate"> | Date | string
     updatedAt?: DateTimeFilter<"ChatTemplate"> | Date | string
@@ -9636,6 +9650,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     content?: SortOrder
+    commands?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9644,6 +9659,7 @@ export namespace Prisma {
 
   export type ChatTemplateWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    commands?: string
     AND?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
     OR?: ChatTemplateWhereInput[]
     NOT?: ChatTemplateWhereInput | ChatTemplateWhereInput[]
@@ -9652,12 +9668,13 @@ export namespace Prisma {
     isActive?: BoolFilter<"ChatTemplate"> | boolean
     createdAt?: DateTimeFilter<"ChatTemplate"> | Date | string
     updatedAt?: DateTimeFilter<"ChatTemplate"> | Date | string
-  }, "id">
+  }, "id" | "commands">
 
   export type ChatTemplateOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     content?: SortOrder
+    commands?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -9675,6 +9692,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"ChatTemplate"> | number
     name?: StringWithAggregatesFilter<"ChatTemplate"> | string
     content?: StringWithAggregatesFilter<"ChatTemplate"> | string
+    commands?: StringNullableWithAggregatesFilter<"ChatTemplate"> | string | null
     isActive?: BoolWithAggregatesFilter<"ChatTemplate"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"ChatTemplate"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ChatTemplate"> | Date | string
@@ -10270,6 +10288,7 @@ export namespace Prisma {
   export type ChatTemplateCreateInput = {
     name: string
     content: string
+    commands?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10279,6 +10298,7 @@ export namespace Prisma {
     id?: number
     name: string
     content: string
+    commands?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10287,6 +10307,7 @@ export namespace Prisma {
   export type ChatTemplateUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    commands?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10296,6 +10317,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    commands?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10305,6 +10327,7 @@ export namespace Prisma {
     id?: number
     name: string
     content: string
+    commands?: string | null
     isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -10313,6 +10336,7 @@ export namespace Prisma {
   export type ChatTemplateUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    commands?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10322,6 +10346,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     content?: StringFieldUpdateOperationsInput | string
+    commands?: NullableStringFieldUpdateOperationsInput | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11041,6 +11066,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     content?: SortOrder
+    commands?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11054,6 +11080,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     content?: SortOrder
+    commands?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -11063,6 +11090,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     content?: SortOrder
+    commands?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder

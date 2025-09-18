@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
  */
 export const createTemplate = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, content, isActive } = req.body;
+    const { name, content, isActive, commands } = req.body;
 
     if (!name || !content) {
       res.status(400).json({ success: false, message: 'Name and content are required' });
@@ -21,6 +21,7 @@ export const createTemplate = async (req: Request, res: Response): Promise<void>
         name: String(name).trim(),
         content: String(content),
         isActive: typeof isActive === 'boolean' ? isActive : true,
+        ...(commands !== undefined ? { commands: String(commands).trim() } : {})
       }
     });
 
@@ -29,7 +30,11 @@ export const createTemplate = async (req: Request, res: Response): Promise<void>
       message: 'Chat template created successfully',
       data: template
     });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 'P2002' && Array.isArray(error?.meta?.target) && error.meta.target.includes('commands')) {
+      res.status(409).json({ success: false, message: 'Command already exists, must be unique' });
+      return;
+    }
     console.error('Create chat template error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
@@ -45,6 +50,7 @@ export const getTemplates = async (req: Request, res: Response): Promise<void> =
     const limit = parseInt((req.query.limit as string) || '10');
     const isActiveParam = req.query.isActive as string | undefined;
     const q = (req.query.q as string | undefined)?.trim();
+    const cmd = (req.query.command as string | undefined)?.trim();
 
     const skip = (page - 1) * limit;
 
@@ -54,9 +60,15 @@ export const getTemplates = async (req: Request, res: Response): Promise<void> =
 
     if (q && q.length > 0) {
       where.OR = [
-        { name: { contains: q, mode: 'insensitive' } },
-        { content: { contains: q, mode: 'insensitive' } }
+        { name: { contains: q } },
+        { content: { contains: q } },
+        { commands: { contains: q } }
       ];
+    }
+
+    if (cmd && cmd.length > 0) {
+      // exact match for command filter
+      where.commands = cmd;
     }
 
     const [items, total] = await Promise.all([
@@ -107,20 +119,49 @@ export const getTemplateById = async (req: Request, res: Response): Promise<void
 };
 
 /**
+ * Get chat template by caller command (exact match)
+ * @route GET /api/v1/chat-templates/by-command/{command}
+ */
+export const getTemplateByCommand = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const cmd = (req.params.command || '').trim();
+    if (!cmd) {
+      res.status(400).json({ success: false, message: 'Command is required' });
+      return;
+    }
+
+    const template = await prisma.chatTemplate.findFirst({
+      where: { commands: cmd, isActive: true },
+      orderBy: { updatedAt: 'desc' }
+    });
+
+    if (!template) {
+      res.status(404).json({ success: false, message: 'Template not found for command' });
+      return;
+    }
+
+    res.status(200).json({ success: true, message: 'Chat template retrieved by command', data: template });
+  } catch (error) {
+    console.error('Get chat template by command error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
  * Update chat template by ID
  * @route PUT /api/v1/chat-templates/:id
  */
 export const updateTemplate = async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
-    const { name, content, isActive } = req.body;
+    const { name, content, isActive, commands } = req.body;
 
     if (isNaN(id)) {
       res.status(400).json({ success: false, message: 'Invalid template ID' });
       return;
     }
 
-    if (!name && !content && typeof isActive !== 'boolean') {
+    if (!name && !content && typeof isActive !== 'boolean' && commands === undefined) {
       res.status(400).json({ success: false, message: 'Nothing to update' });
       return;
     }
@@ -136,12 +177,17 @@ export const updateTemplate = async (req: Request, res: Response): Promise<void>
       data: {
         ...(name !== undefined ? { name: String(name).trim() } : {}),
         ...(content !== undefined ? { content: String(content) } : {}),
-        ...(typeof isActive === 'boolean' ? { isActive } : {})
+        ...(typeof isActive === 'boolean' ? { isActive } : {}),
+        ...(commands !== undefined ? { commands: String(commands).trim() } : {})
       }
     });
 
     res.status(200).json({ success: true, message: 'Chat template updated successfully', data: updated });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 'P2002' && Array.isArray(error?.meta?.target) && error.meta.target.includes('commands')) {
+      res.status(409).json({ success: false, message: 'Command already exists, must be unique' });
+      return;
+    }
     console.error('Update chat template error:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }

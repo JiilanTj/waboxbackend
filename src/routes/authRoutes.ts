@@ -57,7 +57,7 @@ router.post('/api/v1/login', login);
  *     description: Get the profile of the currently authenticated user
  *     tags: [Authentication]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: User profile retrieved successfully
@@ -97,7 +97,7 @@ router.get('/api/v1/me', authenticateToken, getMe);
  *     description: Logout the current user (client-side token invalidation)
  *     tags: [Authentication]
  *     security:
- *       - BearerAuth: []
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout successful

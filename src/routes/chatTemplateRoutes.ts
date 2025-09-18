@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken } from '../utils/middleware';
-import { createTemplate, getTemplates, getTemplateById, updateTemplate, deleteTemplate } from '../controllers/chatTemplateController';
+import { createTemplate, getTemplates, getTemplateById, updateTemplate, deleteTemplate, getTemplateByCommand } from '../controllers/chatTemplateController';
 
 const router = Router();
 
@@ -39,7 +39,12 @@ const router = Router();
  *         name: q
  *         schema:
  *           type: string
- *         description: Search by name or content
+ *         description: Search by name, content, or commands
+ *       - in: query
+ *         name: command
+ *         schema:
+ *           type: string
+ *         description: Filter by exact caller command (e.g., "/greetings")
  *     responses:
  *       200:
  *         description: Chat templates retrieved
@@ -68,6 +73,27 @@ router.get('/api/v1/chat-templates/:id', authenticateToken, getTemplateById);
 
 /**
  * @swagger
+ * /api/v1/chat-templates/by-command/{command}:
+ *   get:
+ *     summary: Get chat template by caller command
+ *     tags: [Chat Templates]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: command
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "/greetings"
+ *     responses:
+ *       200:
+ *         description: Chat template retrieved
+ */
+router.get('/api/v1/chat-templates/by-command/:command', authenticateToken, getTemplateByCommand);
+
+/**
+ * @swagger
  * /api/v1/chat-templates:
  *   post:
  *     summary: Create chat template
@@ -86,8 +112,16 @@ router.get('/api/v1/chat-templates/:id', authenticateToken, getTemplateById);
  *                 type: string
  *               content:
  *                 type: string
+ *               commands:
+ *                 type: string
+ *                 description: Caller command trigger (e.g., "/greetings")
  *               isActive:
  *                 type: boolean
+ *           example:
+ *             name: "*HALO* \n saya cs 1"
+ *             content: "Terima kasih sudah menghubungi kami. Ada yang bisa dibantu?"
+ *             commands: "/greetings"
+ *             isActive: true
  *     responses:
  *       201:
  *         description: Chat template created
@@ -119,6 +153,9 @@ router.post('/api/v1/chat-templates', authenticateToken, createTemplate);
  *                 type: string
  *               content:
  *                 type: string
+ *               commands:
+ *                 type: string
+ *                 description: Caller command trigger (e.g., "/greetings")
  *               isActive:
  *                 type: boolean
  *     responses:

@@ -74,6 +74,11 @@ const socket = io('http://localhost:5000', {
     {
       name: 'WaPermissions',
       description: 'WhatsApp number permissions management endpoints'
+    },
+    // Added global tag for Chat Templates
+    {
+      name: 'Chat Templates',
+      description: 'Manage chat message templates and caller commands'
     }
   ],
   servers: [
@@ -463,12 +468,127 @@ const socket = io('http://localhost:5000', {
             description: 'Available real-time features'
           }
         }
+      },
+      // ------------------ Chat Template Schemas ------------------
+      ChatTemplate: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', description: 'Template ID' },
+          name: { type: 'string', description: 'Template display name' },
+          content: { type: 'string', description: 'Message content body, can include formatting' },
+          commands: { type: 'string', nullable: true, description: 'Caller command trigger (unique), e.g. "/greetings"' },
+          isActive: { type: 'boolean', description: 'Whether the template is active' },
+          createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
+          updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' }
+        },
+        example: {
+          id: 1,
+          name: '*HALO* \n saya cs 1',
+          content: 'Terima kasih sudah menghubungi kami. Ada yang bisa dibantu?',
+          commands: '/greetings',
+          isActive: true,
+          createdAt: '2025-09-17T03:21:15.000Z',
+          updatedAt: '2025-09-17T03:21:15.000Z'
+        }
+      },
+      CreateChatTemplateRequest: {
+        type: 'object',
+        required: ['name', 'content'],
+        properties: {
+          name: { type: 'string', description: 'Template display name' },
+          content: { type: 'string', description: 'Message content body' },
+          commands: { type: 'string', description: 'Caller command trigger (unique), e.g. "/greetings"' },
+          isActive: { type: 'boolean', default: true, description: 'Whether the template is active' }
+        },
+        example: {
+          name: '*HALO* \n saya cs 1',
+          content: 'Terima kasih sudah menghubungi kami. Ada yang bisa dibantu?',
+          commands: '/greetings',
+          isActive: true
+        }
+      },
+      UpdateChatTemplateRequest: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          content: { type: 'string' },
+          commands: { type: 'string', description: 'Caller command trigger (unique), e.g. "/greetings"' },
+          isActive: { type: 'boolean' }
+        },
+        example: {
+          name: 'Greeting v2',
+          isActive: false
+        }
+      },
+      ChatTemplateResponse: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean' },
+          message: { type: 'string' },
+          data: { $ref: '#/components/schemas/ChatTemplate' }
+        },
+        example: {
+          success: true,
+          message: 'Chat template retrieved successfully',
+          data: {
+            id: 1,
+            name: '*HALO* \n saya cs 1',
+            content: 'Terima kasih sudah menghubungi kami. Ada yang bisa dibantu?',
+            commands: '/greetings',
+            isActive: true,
+            createdAt: '2025-09-17T03:21:15.000Z',
+            updatedAt: '2025-09-17T03:21:15.000Z'
+          }
+        }
+      },
+      ChatTemplateListResponse: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean' },
+          message: { type: 'string' },
+          data: {
+            type: 'array',
+            items: { $ref: '#/components/schemas/ChatTemplate' }
+          },
+          pagination: {
+            type: 'object',
+            properties: {
+              currentPage: { type: 'integer' },
+              itemsPerPage: { type: 'integer' },
+              totalItems: { type: 'integer' },
+              totalPages: { type: 'integer' }
+            }
+          }
+        },
+        example: {
+          success: true,
+          message: 'Chat templates retrieved successfully',
+          data: [
+            {
+              id: 1,
+              name: '*HALO* \n saya cs 1',
+              content: 'Terima kasih sudah menghubungi kami. Ada yang bisa dibantu?',
+              commands: '/greetings',
+              isActive: true,
+              createdAt: '2025-09-17T03:21:15.000Z',
+              updatedAt: '2025-09-17T03:21:15.000Z'
+            }
+          ],
+          pagination: {
+            currentPage: 1,
+            itemsPerPage: 10,
+            totalItems: 1,
+            totalPages: 1
+          }
+        }
       }
+      // -----------------------------------------------------------
     }
   },
   security: [
     {
-      BearerAuth: []
+      // Align with defined security scheme key
+      bearerAuth: []
     }
   ]
 };
